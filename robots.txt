@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ebenezeraghouston.github.io/ebenezer-church-app/sitemap.xml

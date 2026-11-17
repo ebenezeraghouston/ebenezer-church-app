@@ -1,0 +1,47 @@
+name: Church Event Reminders (Day Before and Day Of)
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Hourly; Python checks 9 AM America/Chicago, including DST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview reminders without sending'
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: church-event-reminders
+  cancel-in-progress: false
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check and send reminders
+        env:
+          ONESIGNAL_APP_ID: ${{ vars.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+          FORCE_CHECK: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        run: python scripts/send_event_reminders.py
+      - name: Commit send ledger (if changed)
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+        run: |
+          if ! git diff --quiet -- reminder-state.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add reminder-state.json
+            git commit -m "Record sent event reminders"
+            git push
+          fi

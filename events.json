@@ -1,62 +1,111 @@
 [
   {
+    "id": "youth-meeting-2026-11-21",
     "date": "2026-11-21",
-    "time": "19:00",
     "title": "Youth Meeting",
-    "details": "At church. Contact Albin or Jeff for program participation."
+    "time": "7:00 PM",
+    "note": "At church · Contact Albin for programs",
+    "details": "Join us for our Youth Meeting. Contact Albin if you would like to participate in a program. Bible Quiz: 1 Samuel 16–20.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2026-11-21T19:00:00",
+    "flyer": "flyers/youth-meeting-nov21.png"
   },
   {
+    "id": "thanksgiving-2026-11-25",
     "date": "2026-11-25",
-    "time": "19:00",
-    "title": "Thanksgiving Dinner",
-    "details": "Church fellowship meal. Invite friends and family."
+    "title": "Thanksgiving Gathering",
+    "time": "7:00 PM",
+    "note": "At church · Invite friends and family",
+    "details": "Join us for a special Thanksgiving gathering. Invite your friends and family as we come together in fellowship and gratitude.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2026-11-25T19:00:00",
+    "flyer": "flyers/thanksgiving-dinner-nov25.png",
+    "signup_url": "https://docs.google.com/spreadsheets/d/1gDVF8Gvrac_D_2c4Dru5tji0FdK9NUsmx7yPHJOmuVM/edit?usp=sharing",
+    "signup_label": "Sign Up for Thanksgiving Food"
   },
   {
+    "id": "fasting-prayer-2026-11-27",
     "date": "2026-11-27",
-    "time": null,
-    "title": "Fasting Prayer • Nov 27–29",
-    "details": "At church. Friday and Saturday: 10 AM–12 PM and 7–9 PM; Sunday includes the Lord’s Table."
+    "end": "2026-11-29",
+    "title": "Fasting Prayer",
+    "time": "Friday & Saturday: 10:00 AM–12:00 PM and 7:00–9:00 PM; Sunday: Lord’s Table (time not listed)",
+    "note": "All services at church",
+    "details": "November 27–29 at church. Friday and Saturday morning sessions: 10:00 AM–12:00 PM; evening sessions: 7:00–9:00 PM. Sunday: The Lord’s Table (time not specified on flyer).",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "flyer": "flyers/fasting-prayer-nov27-29.png"
   },
   {
+    "id": "ag-fellowship-2026-12-06",
     "date": "2026-12-06",
-    "time": null,
     "title": "Combined AG Fellowship",
-    "details": "At Ebenezer Assembly of God. Time to be announced."
+    "time": "Time to be announced",
+    "note": "At church",
+    "details": "Join us for our combined AG Fellowship at Ebenezer Assembly of God.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047"
   },
   {
+    "id": "womens-fellowship-2026-12-12",
     "date": "2026-12-12",
-    "time": "16:00",
-    "title": "Women’s Fellowship",
-    "details": "At church."
+    "title": "Women’s Meeting",
+    "time": "4:00 PM",
+    "note": "At church",
+    "details": "Women’s Meeting on Saturday, December 12, 2026 at 4:00 PM at Ebenezer Assembly of God.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2026-12-12T16:00:00",
+    "flyer": "flyers/womens-meeting-dec12.png"
   },
   {
+    "id": "christmas-outreach-2026-12-20",
     "date": "2026-12-20",
-    "time": null,
-    "title": "Christmas Outreach • Dec 20–23",
-    "details": "Contact Jeff if you would like to host outreach in your home."
+    "end": "2026-12-23",
+    "title": "Christmas Outreach",
+    "time": "Times vary",
+    "note": "Contact Jeff to host",
+    "details": "Christmas Outreach will take place December 20 through 23. Contact Jeff if you are interested in hosting an outreach gathering.",
+    "flyer": "flyers/christmas-outreach-dec20-23.png"
   },
   {
+    "id": "candlelight-2026-12-24",
     "date": "2026-12-24",
-    "time": "19:00",
     "title": "Candlelight Service",
-    "details": "At church."
+    "time": "7:00 PM",
+    "note": "At church",
+    "details": "Join us for our Christmas Eve Candlelight Service.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2026-12-24T19:00:00",
+    "flyer": "flyers/candlelight-dec24.png"
   },
   {
+    "id": "year-end-2026-12-31",
     "date": "2026-12-31",
-    "time": null,
-    "title": "Year-End / New Year Service",
-    "details": "At church. Time to be announced."
+    "title": "Year-End Service",
+    "time": "Time to be announced",
+    "note": "At church",
+    "details": "Join us for our year-end worship service as we close 2026 together.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "flyer": "flyers/year-end-dec31.png",
+    "signup_url": "https://docs.google.com/spreadsheets/d/16sAeqxQQlC_Hy_Yh2N73KC-rPtKajobOchnpKOPOnrc/edit?usp=sharing",
+    "signup_label": "Sign Up for Year-End Food"
   },
   {
+    "id": "fasting-prayer-2027-01-03",
     "date": "2027-01-03",
-    "time": null,
-    "title": "Fasting Prayer • Jan 3–10",
-    "details": "Morning and evening prayer sessions. Sign-up details to follow."
+    "end": "2027-01-10",
+    "title": "Fasting Prayer",
+    "time": "Morning and evening (times to be announced)",
+    "note": "January 3–10 · Sign-up sheet will be available",
+    "details": "Fasting Prayer from January 3 through January 10, 2027. Morning and evening prayer sessions. A sign-up sheet will be available. Specific times and locations to be confirmed.",
+    "flyer": "flyers/fasting-prayer-jan3-10.png"
   },
   {
+    "id": "church-anniversary-2027-01-16",
     "date": "2027-01-16",
-    "time": "17:00",
     "title": "Church Anniversary",
-    "details": "At church."
+    "time": "5:00 PM",
+    "note": "At church",
+    "details": "Celebrate the Church Anniversary at Ebenezer Assembly of God on January 16, 2027, at 5:00 PM.",
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2027-01-16T17:00:00",
+    "flyer": "flyers/church-anniversary-jan16.png"
   }
 ]

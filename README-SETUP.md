@@ -23,3 +23,12 @@ This is a fresh, standalone set of public-only files, not an export of the old r
 - Google Search indexing can be requested after the new site is live.
 - Deleting the original repo does not eliminate previously cached or copied personal data. If members' data was exposed, discuss appropriate notification and response steps with church leadership.
 - This is a privacy-conscious rebuild, not a formal security audit.
+
+
+## Modern home page / install instructions
+The Home page now displays **Worship. Grow. Serve.** and a visible **Add to Home Screen** button. Android browsers supporting the PWA installation prompt can show an install dialog; iPhone Safari and browsers without that prompt receive manual instructions. The site must be deployed via HTTPS on GitHub Pages. Installing does not automatically grant notification permission.
+
+This package contains no celebrations.json or private member directory. Do not import old repository history, backups, or personal files.
+
+
+This update adds the user-provided sunset church photo, public event flyers, and food sign-up links. Upload all files including flyers/ and assets/. No member directory or celebrations.json is included.

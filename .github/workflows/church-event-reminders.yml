@@ -1,0 +1,47 @@
+name: Church Event Reminders (Day Before and Day Of)
+on:
+  schedule:
+    # 9 AM CST (winter) and 9 AM CDT (summer). The script checks local time.
+    - cron: '0 14,15 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview reminders without sending notifications'
+        required: true
+        type: boolean
+        default: true
+      preview_date:
+        description: 'Optional date for dry-run preview (YYYY-MM-DD)'
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: church-event-reminders
+  cancel-in-progress: false
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check Houston local time
+        id: local
+        env:
+          TZ: America/Chicago
+        run: |
+          echo "hour=$(date +%H)" >> "$GITHUB_OUTPUT"
+          echo "Houston time: $(date)"
+      - name: Preview or send reminders
+        if: github.event_name == 'workflow_dispatch' || steps.local.outputs.hour == '09'
+        env:
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          PREVIEW_DATE: ${{ github.event.inputs.preview_date }}
+        run: |
+          args=()
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$DRY_RUN" != "false" ]]; then args+=(--dry-run); fi
+          if [[ -n "$PREVIEW_DATE" ]]; then args+=(--date "$PREVIEW_DATE"); fi
+          python scripts/send_event_reminders.py "${args[@]}"

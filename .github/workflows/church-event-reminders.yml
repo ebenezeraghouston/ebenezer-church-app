@@ -3,6 +3,9 @@ on:
   schedule:
     # 9 AM CST (winter) and 9 AM CDT (summer). The script checks local time.
     - cron: '0 14,15 * * *'
+    # Weekly Zoom meetings: 30 minutes before 10 AM Friday / 2 PM Mon–Thu.
+    # Cover CST and CDT, retry within a 20-minute window if GitHub runs late.
+    - cron: '30,40,50 13,14,19,20 * * 1-5'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -12,6 +15,10 @@ on:
         default: true
       preview_date:
         description: 'Optional date for dry-run preview (YYYY-MM-DD)'
+        required: false
+        type: string
+      preview_time:
+        description: 'Optional Houston local time HH:MM for dry-run weekly test'
         required: false
         type: string
 permissions:
@@ -27,21 +34,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Check Houston local time
-        id: local
+      - name: Show Houston local time
         env:
           TZ: America/Chicago
-        run: |
-          echo "hour=$(date +%H)" >> "$GITHUB_OUTPUT"
-          echo "Houston time: $(date)"
+        run: echo "Houston time $(date)"
       - name: Preview or send reminders
-        if: github.event_name == 'workflow_dispatch' || steps.local.outputs.hour == '09'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         env:
           ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           PREVIEW_DATE: ${{ github.event.inputs.preview_date }}
+          PREVIEW_TIME: ${{ github.event.inputs.preview_time }}
         run: |
           args=()
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$DRY_RUN" != "false" ]]; then args+=(--dry-run); fi
           if [[ -n "$PREVIEW_DATE" ]]; then args+=(--date "$PREVIEW_DATE"); fi
+          if [[ -n "$PREVIEW_TIME" ]]; then args+=(--preview-time "$PREVIEW_TIME"); fi
           python scripts/send_event_reminders.py "${args[@]}"

@@ -10,7 +10,7 @@ const message=(t)=>{status.textContent=t;};
 let auth,db,user=null,isAdmin=false,isApproved=false;
 const show=(el,yes)=>{el.hidden=!yes;};
 function entryHTML(id,data,editable){
- const fields=[data.family,data.phone,data.email,data.notes].filter(Boolean).map(v=>'<p>'+esc(v)+'</p>').join('');
+ const fields=[data.family,data.phone,data.email,data.notes].filter(Boolean).map(v=>'<p>'+esc(v)+'</p>').join('')+(data.address?'<p>📍 '+esc(data.address)+' <a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(data.address)+'" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a></p>':'');
  return '<article class="panel" style="margin:12px 0"><strong>'+esc(data.name)+'</strong>'+fields+(editable?'<p><button class="btn" type="button" data-edit="'+esc(id)+'">Edit</button> <button class="btn" type="button" data-delete="'+esc(id)+'">Delete</button></p>':'')+'</article>';
 }
 async function refreshDirectory(){
@@ -23,7 +23,7 @@ async function refreshDirectory(){
  entries.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{
  const r=records.find(x=>x.id===b.dataset.edit);if(!r)return;
  $('directory-entry-id').value=r.id;
- for(const key of ['name','phone','email','family','notes'])$('directory-'+key).value=r[key]||'';
+ for(const key of ['name','phone','email','address','family','notes'])$('directory-'+key).value=r[key]||'';
  $('directory-save').textContent='Save Changes';form.scrollIntoView({behavior:'smooth',block:'center'});
  }));
  entries.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',async()=>{
@@ -79,7 +79,7 @@ try{
  logout.addEventListener('click',()=>signOut(auth).catch(e=>message('Sign-out failed: '+e.message)));
  getRedirectResult(auth).catch(e=>message('Google sign-in could not complete: '+e.message));
  $('directory-request-button').addEventListener('click',async()=>{if(!user)return;const b=$('directory-request-button');b.disabled=true;try{await setDoc(doc(db,'accessRequests',user.uid),{email:user.email||'',name:user.displayName||'',requestedAt:serverTimestamp()});b.textContent='Request submitted';message('You are not an authorized user yet. Your access request has been submitted and is awaiting church administrator approval.');}catch(e){message('Could not request access: '+e.message);b.disabled=false;}});
- form.addEventListener('submit',async e=>{e.preventDefault();if(!isAdmin)return;const id=$('directory-entry-id').value;const data={};for(const k of ['name','phone','email','family','notes'])data[k]=$('directory-'+k).value.trim();if(!data.name)return;
+ form.addEventListener('submit',async e=>{e.preventDefault();if(!isAdmin)return;const id=$('directory-entry-id').value;const data={};for(const k of ['name','phone','email','address','family','notes'])data[k]=$('directory-'+k).value.trim();if(!data.name)return;
  const save=$('directory-save');save.disabled=true;
  try{if(id)await setDoc(doc(db,'directory',id),data);else await addDoc(collection(db,'directory'),data);form.reset();$('directory-entry-id').value='';save.textContent='Add Entry';message('Directory entry saved.');await refreshDirectory();}catch(err){message('Could not save: '+err.message);}finally{save.disabled=false;}
  });

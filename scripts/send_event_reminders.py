@@ -31,7 +31,9 @@ def main():
     count = 0
     history_path = ROOT / 'notifications.json'
     history = json.loads(history_path.read_text(encoding='utf-8'))
-    history_changed = False
+    original_count = len(history)
+    history = [item for item in history if item.get('sent_at') and now - datetime.fromisoformat(item['sent_at']) < timedelta(hours=24)]
+    history_changed = len(history) != original_count and not args.dry_run
     def send(title, body, token, url):
         nonlocal count, history_changed
         count += 1

@@ -79,9 +79,9 @@ function downloadEventCalendar(e){
  // Use a one-hour placeholder only for events with a confirmed start time and no published end.
  const end=timed?(()=>{const d=new Date(start+'Z');d.setUTCHours(d.getUTCHours()+1);return 'DTEND;TZID=America/Chicago:'+d.toISOString().slice(0,19).replace(/[-:]/g,'')})():'DTEND;VALUE=DATE:'+icsDate(endDate);
  const desc=[e.details||e.note||'',e.time?'Published schedule: '+e.time:'','Church app: https://ebenezeraghouston.github.io/ebenezer-church-app/#events'].filter(Boolean).join(' | ');
- const alarm=(minutes,label)=>['BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEscape(label+': '+e.title),'TRIGGER:'+minutes,'END:VALARM'].join('\\r\\n');
+ const alarm=(minutes,label)=>['BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEscape(label+': '+e.title),'TRIGGER:'+minutes,'END:VALARM'].join('\r\n');
  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Ebenezer AG//Church Events//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VTIMEZONE','TZID:America/Chicago','BEGIN:DAYLIGHT','DTSTART:19700308T020000','TZOFFSETFROM:-0600','TZOFFSETTO:-0500','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU','END:DAYLIGHT','BEGIN:STANDARD','DTSTART:19701101T020000','TZOFFSETFROM:-0500','TZOFFSETTO:-0600','RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT','UID:'+icsEscape(e.id||e.title+'-'+e.date)+'@ebenezeraghouston.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\\.\\d{3}/,'').replace('Z','Z'),dtstart,end,'SUMMARY:'+icsEscape(e.title),'DESCRIPTION:'+icsEscape(desc),...(e.location?['LOCATION:'+icsEscape(e.location)]:[]),alarm('-P1D','Tomorrow'),alarm(timed?'-PT0M':'PT9H','Today'),'END:VEVENT','END:VCALENDAR'];
- const blob=new Blob([lines.join('\\r\\n')+'\\r\\n'],{type:'text/calendar;charset=utf-8'});
+ const blob=new Blob([lines.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(e.id||'ebenezer-event')+'.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calendar-id]');if(!b)return;const event=churchEvents.find(x=>(x.id||x.date+'-'+x.title)===b.dataset.calendarId);if(event)downloadEventCalendar(event)});

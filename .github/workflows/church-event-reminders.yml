@@ -5,7 +5,7 @@ on:
     - cron: '0 14,15 * * *'
     # Weekly Zoom meetings: 30 minutes before 10 AM Friday / 2 PM Mon–Thu.
     # Cover CST and CDT, retry within a 20-minute window if GitHub runs late.
-    - cron: '30,40,50 13,14,19,20 * * 1-5'
+    - cron: '30,40,50 14,15,18,19 * * 1-5'
   workflow_dispatch:
     inputs:
       dry_run:

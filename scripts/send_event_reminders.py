@@ -29,8 +29,11 @@ def main():
     if not args.dry_run and not key:
         raise SystemExit('Missing secret ONESIGNAL_REST_API_KEY')
     count = 0
+    history_path = ROOT / 'notifications.json'
+    history = json.loads(history_path.read_text(encoding='utf-8'))
+    history_changed = False
     def send(title, body, token, url):
-        nonlocal count
+        nonlocal count, history_changed
         count += 1
         print(f'{title}: {body}', flush=True)
         if args.dry_run:
@@ -42,6 +45,9 @@ def main():
         if not result.get('id'):
             raise RuntimeError('OneSignal notification not accepted: ' + str(result.get('errors', 'unknown error')))
         print('OneSignal accepted notification:', result['id'])
+        if not any(item.get('id') == str(token) for item in history):
+            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id']})
+            history_changed = True
     for event in events:
         if not (now.hour == 9 and now.minute < 20) and not args.dry_run:
             continue
@@ -78,6 +84,8 @@ def main():
         token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{today}/30min')
         notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
         send(title,body,token,notice_url)
+    if history_changed:
+        history_path.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'{today}: {count} reminder(s) {"previewed" if args.dry_run else "processed"}.')
 
 if __name__ == '__main__':

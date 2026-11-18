@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-APP_ID = '7aafcda2-45a3-4747-8527-e4f8a7b38692'
+APP_ID = '85bfa892-43b6-40ec-8f07-255f95f6fd43'
 BASE = 'https://ebenezeraghouston.github.io/ebenezer-church-app/#events'
 
 def main():

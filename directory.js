@@ -68,7 +68,7 @@ async function updateUser(u){
  try{
  if(!isAdmin){const approval=await getDoc(doc(db,'approvedMembers',u.uid));isApproved=approval.exists()&&approval.data().approved===true;}
  if(isApproved){message(isAdmin?'Administrator access enabled.':'Approved member access enabled.');show(members,true);show(adminPanel,isAdmin);await refreshDirectory();if(isAdmin)await refreshAdmin();}
- else{message('Your account is not yet approved. Request access below.');show(request,true);const existing=await getDoc(doc(db,'accessRequests',u.uid));$('directory-request-button').disabled=existing.exists();$('directory-request-button').textContent=existing.exists()?'Request already submitted':'Request Directory Access';}
+ else{message('You are not an authorized user. Your Google account has not been approved to view the church directory. You may request access below.');show(request,true);const existing=await getDoc(doc(db,'accessRequests',u.uid));$('directory-request-button').disabled=existing.exists();$('directory-request-button').textContent=existing.exists()?'Request already submitted':'Request Directory Access';}
  }catch(e){message('Access check failed. Verify Firestore rules: '+e.message);}
 }
 try{
@@ -77,7 +77,7 @@ try{
  login.addEventListener('click',async()=>{login.disabled=true;message('Opening Google sign-in…');try{await signInWithPopup(auth,provider);}catch(e){if(e.code==='auth/popup-blocked'){await signInWithRedirect(auth,provider);}else{message('Sign-in failed: '+e.message);login.disabled=false;}}});
  logout.addEventListener('click',()=>signOut(auth).catch(e=>message('Sign-out failed: '+e.message)));
  getRedirectResult(auth).catch(e=>message('Google sign-in could not complete: '+e.message));
- $('directory-request-button').addEventListener('click',async()=>{if(!user)return;const b=$('directory-request-button');b.disabled=true;try{await setDoc(doc(db,'accessRequests',user.uid),{email:user.email||'',name:user.displayName||'',requestedAt:serverTimestamp()});b.textContent='Request submitted';message('Access request submitted. A church administrator must approve it.');}catch(e){message('Could not request access: '+e.message);b.disabled=false;}});
+ $('directory-request-button').addEventListener('click',async()=>{if(!user)return;const b=$('directory-request-button');b.disabled=true;try{await setDoc(doc(db,'accessRequests',user.uid),{email:user.email||'',name:user.displayName||'',requestedAt:serverTimestamp()});b.textContent='Request submitted';message('You are not an authorized user yet. Your access request has been submitted and is awaiting church administrator approval.');}catch(e){message('Could not request access: '+e.message);b.disabled=false;}});
  form.addEventListener('submit',async e=>{e.preventDefault();if(!isAdmin)return;const id=$('directory-entry-id').value;const data={};for(const k of ['name','phone','email','family','notes'])data[k]=$('directory-'+k).value.trim();if(!data.name)return;
  const save=$('directory-save');save.disabled=true;
  try{if(id)await setDoc(doc(db,'directory',id),data);else await addDoc(collection(db,'directory'),data);form.reset();$('directory-entry-id').value='';save.textContent='Add Entry';message('Directory entry saved.');await refreshDirectory();}catch(err){message('Could not save: '+err.message);}finally{save.disabled=false;}

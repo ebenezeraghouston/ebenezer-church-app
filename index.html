@@ -55,7 +55,7 @@ header h1{color:#075b62}header p{color:#47767a}
 
 <script>
 'use strict';
-const menuToggle=document.getElementById('menu-toggle'),appMenu=document.getElementById('app-menu');menuToggle.addEventListener('click',()=>{appMenu.hidden=!appMenu.hidden;menuToggle.setAttribute('aria-expanded',String(!appMenu.hidden))});document.addEventListener('click',e=>{if(!e.target.closest('.header-menu')){appMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false')}});document.getElementById('quick-install').addEventListener('click',()=>document.getElementById('install-app').click());
+const menuToggle=document.getElementById('menu-toggle'),appMenu=document.getElementById('app-menu');menuToggle.addEventListener('click',()=>{appMenu.hidden=!appMenu.hidden;menuToggle.setAttribute('aria-expanded',String(!appMenu.hidden))});document.addEventListener('click',e=>{if(!e.target.closest('.header-menu')){appMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false')}});
 const tabs=['home','events','ministries','giving','pastors','notifications','directory'];
 function showTab(name){if(!tabs.includes(name))return;appMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false');document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.id===name));document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));history.replaceState(null,'','#'+name);window.scrollTo({top:0,behavior:'instant'});if(typeof gtag==='function')gtag('event','app_section_view',{section_name:name});}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));if(tabs.includes(location.hash.slice(1)))showTab(location.hash.slice(1));

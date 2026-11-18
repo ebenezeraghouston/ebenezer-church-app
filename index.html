@@ -48,7 +48,7 @@ header h1{color:#075b62}header p{color:#47767a}
 <section class="page" id="ministries"><div class="panel" style="background:#0e2341;color:white"><span class="eyebrow">Connect • Serve • Grow</span><h2 style="font-size:27px;margin:9px 0 17px">Church Ministries</h2><div class="cards" id="ministry-cards"></div><div id="ministry-details" class="team-details" style="color:#13233b" aria-live="polite"></div><p style="margin:22px 0 0"><a class="gold" href="mailto:ebaghouston@gmail.com?subject=I%20Would%20Like%20to%20Serve%20-%20Ebenezer%20AG">🤝 If You'd Like to Serve, Please Let Us Know →</a></p></div><div class="panel"><h2>Other Coordinators & Ministry Associates</h2><div id="other-leaders"></div></div></section>
 <section class="page" id="giving"><div class="panel"><h2>❤️ Giving</h2><p>Thank you for supporting the ministry of Ebenezer Assembly of God.</p><h3>Zelle</h3><p>Use the church's previously provided Zelle number:</p><p><strong id="zelle-number">417-274-1156</strong></p><button class="btn" id="copy-zelle">Copy Zelle number</button><h3>Venmo</h3><p><strong>@Ebenezer-AG</strong></p><a class="btn venmo-direct" href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">Open Venmo</a><p class="status">Confirm the recipient's identity with the church before sending a payment. Payments are processed outside this app.</p></div></section>
 <section class="page" id="pastors"><div class="panel"><h2>⛪ Meet the Pastors</h2><div class="pastor"><img src="assets/pastor-family.jpg" alt="Senior Pastor and family"><div><span class="pill">Senior Pastor</span><h3>Pastor Alex Ramani</h3><p>Welcome to Ebenezer Assembly of God. We invite you to worship and grow with us.</p></div></div></div><div class="panel"><h2>Ministry Associates</h2><p><strong>Malayalam:</strong> Pr. John Lal</p><p><strong>English:</strong> Joel John</p><p><strong>Spanish:</strong> Pr. Carlos Aponte</p></div></section>
-<section class="page" id="notifications"><div class="panel"><h2>🔔 Notifications</h2><p>Stay informed about upcoming services, events, and announcements.</p><p id="push-status" class="status">Push notification setup must be verified after this new app is published.</p><button class="btn" id="enable-push">Enable notifications</button><p class="status">Automatic event reminders are scheduled for 9 AM Houston time on the day before and the day of each event. Enable notifications on your device to receive them. Delivery requires OneSignal and GitHub Actions to be configured and tested.</p></div><div class="panel"><h2>Recent Notifications</h2><p class="status">Church reminders remain here until the church removes them. Tap any message to read it.</p><div id="notification-detail" hidden></div><div id="notification-inbox"></div></div><div class="panel"><h2>Upcoming Events</h2><div id="notification-events"></div></div></section>
+<section class="page" id="notifications"><div class="panel"><h2>🔔 Notifications</h2><p>Stay informed about upcoming services, events, and announcements.</p><p id="push-status" class="status">Push notification setup must be verified after this new app is published.</p><button class="btn" id="enable-push">Enable notifications</button><p class="status">Automatic event reminders are scheduled for 9 AM Houston time on the day before and the day of each event. Enable notifications on your device to receive them. Delivery requires OneSignal and GitHub Actions to be configured and tested.</p></div><div class="panel"><h2>Recent Notifications</h2><p class="status">Notifications show for 24 hours after being sent. Tap a message to mark it Read.</p><div id="notification-detail" hidden></div><div id="notification-inbox"></div></div><div class="panel"><h2>Upcoming Events</h2><div id="notification-events"></div></div></section>
 <footer>Ebenezer Assembly of God • Houston, Texas • <a href="mailto:ebaghouston@gmail.com">Contact the church</a></footer>
 </main>
 
@@ -103,13 +103,21 @@ document.getElementById('copy-zelle').onclick=()=>navigator.clipboard.writeText(
 // Keep a local, device-specific inbox for opened and foreground OneSignal messages.
 const inboxElement=document.getElementById('notification-inbox');
 const inboxStorageKey='ebenezer-ag-notification-inbox-v1';
+const readStorageKey='ebenezer-ag-notification-read-v1';
+const noticeLifetime=24*60*60*1000;
+function noticeKey(m){return String(m.id||m.key||m.title+'|'+m.body)}
+function readMarks(){try{return JSON.parse(localStorage.getItem(readStorageKey)||'{}')}catch{return {}}}
+function markRead(m){const marks=readMarks();marks[noticeKey(m)]=Date.now();try{localStorage.setItem(readStorageKey,JSON.stringify(marks))}catch{}}
+function isFresh(m){const time=new Date(m.sent_at||m.at||0).getTime();return Number.isFinite(time)&&time>0&&time<=Date.now()&&Date.now()-time<noticeLifetime}
 function readInbox(){try{const items=JSON.parse(localStorage.getItem(inboxStorageKey)||'[]');return Array.isArray(items)?items:[]}catch{return []}}
 let sharedNotices=[];
 const detailElement=document.getElementById('notification-detail');
 function allNotices(){
- const seen=new Set();return [...sharedNotices,...readInbox()].filter(m=>{const id=String(m.id||m.key||m.title+'|'+m.body);if(seen.has(id))return false;seen.add(id);return true}).sort((a,b)=>new Date(b.sent_at||b.at||0)-new Date(a.sent_at||a.at||0));
+ const seen=new Set();return [...sharedNotices,...readInbox()].filter(m=>{if(!isFresh(m))return false;const id=noticeKey(m);if(seen.has(id))return false;seen.add(id);return true}).sort((a,b)=>new Date(b.sent_at||b.at||0)-new Date(a.sent_at||a.at||0));
 }
 function openNotice(m){
+ if(!isFresh(m)){detailElement.hidden=true;renderInbox();return}
+ markRead(m);renderInbox();
  detailElement.replaceChildren();detailElement.hidden=false;
  const back=document.createElement('button');back.className='btn';back.textContent='← All Notifications';back.onclick=()=>{detailElement.hidden=true;renderInbox()};
  const heading=document.createElement('h3');heading.textContent=m.title||'Church Notification';
@@ -126,7 +134,8 @@ function renderInbox(){
   const title=document.createElement('h3');title.textContent=m.title||'Church Notification';
   const body=document.createElement('p');body.textContent=m.body||'';
   const when=document.createElement('small');when.className='muted';const stamp=m.sent_at||m.at;if(stamp)when.textContent=new Date(stamp).toLocaleString();
-  button.append(title,body,when);button.onclick=()=>openNotice(m);inboxElement.append(button);
+  const status=document.createElement('small');status.textContent=readMarks()[noticeKey(m)]?'✓ Read':'● Unread';status.style.fontWeight='bold';
+  button.append(status,title,body,when);button.onclick=()=>openNotice(m);inboxElement.append(button);
  });
 }
 async function refreshSharedNotices(){
@@ -134,11 +143,13 @@ async function refreshSharedNotices(){
  catch(error){console.warn('Unable to load shared notification history:',error)}
 }
 refreshSharedNotices();
+window.addEventListener('focus',()=>{refreshSharedNotices();renderInbox()});
 function saveNotice(title,body,id){
  if(!title&&!body)return;
- const messages=readInbox();const key=id||title+'|'+body;
+ const messages=readInbox().filter(isFresh);const key=id||title+'|'+body;
+ const existing=messages.find(m=>m.key===key);
  const filtered=messages.filter(m=>m.key!==key);
- filtered.unshift({key,title:String(title||'Church Notification'),body:String(body||''),at:Date.now()});
+ filtered.unshift({key,title:String(title||'Church Notification'),body:String(body||''),at:existing?.at||Date.now()});
  try{localStorage.setItem(inboxStorageKey,JSON.stringify(filtered.slice(0,40)))}catch{}
  renderInbox();
 }
@@ -147,7 +158,7 @@ renderInbox();
 function readNotificationLink(){
  const url=new URL(location.href);
  const title=url.searchParams.get('notice_title'),body=url.searchParams.get('notice_body');
- if(title||body){saveNotice(title,body,url.searchParams.get('notice_id'));showTab('notifications');openNotice({title,body,at:Date.now()});
+ if(title||body){const id=url.searchParams.get('notice_id');saveNotice(title,body,id);showTab('notifications');openNotice(readInbox().find(m=>m.key===(id||title+'|'+body))||{title,body,at:Date.now()});
  url.searchParams.delete('notice_title');url.searchParams.delete('notice_body');url.searchParams.delete('notice_id');
  history.replaceState(null,'',url.pathname+url.search+'#notifications');
  }
@@ -158,7 +169,7 @@ function watchOneSignalMessages(OneSignal){
  window.ebenezerOneSignalWatch=true;
  OneSignal.Notifications.addEventListener('click',e=>{
   const n=e.notification||{};saveNotice(n.title,n.body,n.notificationId||n.id);
-  showTab('notifications');openNotice({title:n.title,body:n.body,at:Date.now()});
+  showTab('notifications');openNotice(readInbox().find(m=>m.key===(n.notificationId||n.id||n.title+'|'+n.body))||{title:n.title,body:n.body,at:Date.now()});
  });
  OneSignal.Notifications.addEventListener('foregroundWillDisplay',e=>{
   const n=e.notification||{};saveNotice(n.title,n.body,n.notificationId||n.id);

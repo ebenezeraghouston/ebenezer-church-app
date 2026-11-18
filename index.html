@@ -101,7 +101,7 @@ document.getElementById('other-leaders').innerHTML=[['Ministry Associates','Mala
 document.getElementById('copy-zelle').onclick=()=>navigator.clipboard.writeText('4172741156').then(()=>{document.getElementById('copy-zelle').textContent='Copied!'}).catch(()=>{document.getElementById('copy-zelle').textContent='Please copy the number above'});
 // OneSignal requires a valid site configuration and successful deployment to the original HTTPS URL.
 // This new public app intentionally includes no historical notification inbox or member data.
-const ONESIGNAL_APP_ID='7aafcda2-45a3-4747-8527-e4f8a7b38692';
+const ONESIGNAL_APP_ID='85bfa892-43b6-40ec-8f07-255f95f6fd43';
 const pushStatus=document.getElementById('push-status');
 const pushButton=document.getElementById('enable-push');
 if('Notification' in window && Notification.permission==='granted')pushStatus.textContent='Browser permission is allowed. Tap Enable notifications to verify your OneSignal subscription.';

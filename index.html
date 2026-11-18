@@ -39,6 +39,7 @@ header h1{color:#075b62}header p{color:#47767a}
 <header><div class="inner"><img src="church-logo-new.png" alt="Ebenezer Assembly of God Houston church logo"><div><h1>Ebenezer Assembly of God</h1><p>Houston, Texas • Worship. Grow. Serve.</p></div><div class="header-menu"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open app menu" aria-expanded="false" aria-controls="app-menu">☰</button><div class="menu-popover" id="app-menu" hidden><button data-tab="home">⌂ Home</button><button data-tab="events">▦ Events</button><button data-tab="ministries">♧ Ministries</button><button data-tab="giving">♡ Giving</button><button data-tab="pastors">♙ Meet the Pastors</button><button data-tab="notifications">🔔 Notifications</button><a href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">↗ Open Venmo</a></div></div></div></header>
 <main>
 <section class="page active" id="home"><div class="hero"><img src="assets/church-home.jpg" alt="Ebenezer Assembly of God church building"><div class="intro"><span class="eyebrow">Welcome to Ebenezer AG</span><h2>Worship. Grow. Serve.</h2><p>One church family, growing together in faith and service.</p><div class="hero-actions"><button type="button" class="install-button" id="install-app">⬇ Add to Home Screen</button><button type="button" class="hero-secondary" data-tab="events">Explore Events →</button></div><p class="install-feedback" id="install-feedback" aria-live="polite"></p></div></div>
+<div class="panel" id="home-push-panel"><h2>🔔 Stay Connected</h2><p>Enable notifications to receive church event reminders, weekly prayer updates, and announcements.</p><p class="status" id="home-push-status" aria-live="polite">Checking notification status…</p><button class="btn" id="home-enable-push" type="button">Enable Notifications</button></div>
 <div class="quick-links" aria-label="App sections"><button class="quick-link" data-tab="events"><span>📅</span>Events</button><button class="quick-link" data-tab="ministries"><span>🤝</span>Ministries</button><button class="quick-link" data-tab="giving"><span>💛</span>Giving</button><button class="quick-link" data-tab="pastors"><span>⛪</span>Meet the Pastors</button><button class="quick-link" data-tab="notifications"><span>🔔</span>Notifications</button><button class="quick-link" id="quick-install"><span>📲</span>Add to Home Screen</button></div><div class="welcome-strip"><span>✦ Worship</span><span>✦ Grow</span><span>✦ Serve</span></div>
 <div class="panel"><h2>📖 Sunday School</h2><div class="schedule"><span>Malayalam Sunday School</span><span class="time">9:15 AM</span></div><div class="schedule"><span>English Sunday School<br><small class="muted">Elementary, Middle School, High School, College and Adults</small></span><span class="time">11:00 AM</span></div></div>
 <div class="panel"><h2>⛪ Sunday Services</h2><div class="schedule"><span>English Worship Service</span><span class="time">10:00 AM</span></div><div class="schedule"><span>Malayalam Worship Service</span><span class="time">11:00 AM</span></div><div class="schedule"><span>Spanish Service</span><span class="time">2:00 PM</span></div></div>
@@ -181,7 +182,17 @@ function watchOneSignalMessages(OneSignal){
 const ONESIGNAL_APP_ID='85bfa892-43b6-40ec-8f07-255f95f6fd43';
 const pushStatus=document.getElementById('push-status');
 const pushButton=document.getElementById('enable-push');
-if('Notification' in window && Notification.permission==='granted')pushStatus.textContent='Browser permission is allowed. Tap Enable notifications to verify your OneSignal subscription.';
+const homePushButton=document.getElementById('home-enable-push');
+const homePushStatus=document.getElementById('home-push-status');
+function syncPushStatus(){
+ homePushStatus.textContent=pushStatus.textContent;
+ const enabled=pushStatus.textContent.startsWith('Notifications enabled!');
+ homePushButton.textContent=enabled?'✓ Notifications Enabled':'Enable Notifications';
+}
+new MutationObserver(syncPushStatus).observe(pushStatus,{childList:true,characterData:true,subtree:true});
+homePushButton.addEventListener('click',()=>pushButton.click());
+if('Notification' in window && Notification.permission==='granted')pushStatus.textContent='Browser permission is allowed. Checking your OneSignal subscription…';
+syncPushStatus();
 let oneSignalLoading=null;
 let oneSignalReady=null;
 function loadOneSignal(){

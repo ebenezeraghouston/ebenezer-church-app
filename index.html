@@ -7,6 +7,31 @@
 :root{--navy:#0b1930;--gold:#f2c65e}body{background:linear-gradient(160deg,#eaf1f8 0%,#f8fafc 40%,#edf2f8 100%)}header{border-bottom:1px solid #e6edf4}header .inner{padding:18px 20px}header img{box-shadow:0 3px 14px #0b193022}main{max-width:900px}.hero{border-radius:26px;box-shadow:0 18px 40px #071b3530}.hero img{max-height:350px}.hero .intro{background:linear-gradient(135deg,#0b1930,#163a63);padding:28px 26px 25px}.hero h2{font-size:clamp(29px,5vw,44px);font-weight:850;letter-spacing:-.9px;line-height:1.12;margin:10px 0}.hero p{font-size:15px}.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:21px}.install-button,.hero-secondary{border-radius:14px;padding:13px 17px;font-weight:800;border:1px solid #f2c65e}.install-button{background:linear-gradient(110deg,#ffe08c,#efbe4d);color:#14243b;box-shadow:0 5px 16px #0002}.hero-secondary{background:#ffffff14;color:white;border-color:#ffffff70}.install-feedback{font-size:13px!important;color:#f7e2b0!important;margin-top:12px!important;white-space:pre-line}.install-feedback:empty{display:none}.welcome-strip{display:flex;justify-content:space-around;gap:8px;flex-wrap:wrap;padding:18px 10px 3px;font-size:13px;letter-spacing:.7px;font-weight:800;color:#29476a}.panel{border:1px solid #e9eff6;box-shadow:0 8px 28px #0924460c;border-radius:21px;padding:23px}.panel h2{letter-spacing:-.35px}.schedule{align-items:center}.ministry{background:linear-gradient(145deg,#234774,#132d50);box-shadow:0 4px 12px #0002;transition:transform .15s}.ministry:active{transform:scale(.97)}.gold{background:linear-gradient(100deg,#ffdc7c,#edbc48)}nav button.active{background:#e3eefb}nav button{transition:background .15s}.event{line-height:1.5}@media(max-width:420px){.hero .intro{padding:23px 19px}.hero-actions button{flex:1}.panel{padding:19px}.welcome-strip{font-size:11px}}
 .event-flyer{display:block;width:100%;max-height:430px;object-fit:contain;background:#f4f6f9;border-radius:12px;margin:12px 0}.signup-link{display:inline-block;background:#f3c55b;color:#10233e;padding:11px 14px;border-radius:10px;font-weight:750;text-decoration:none}.event{overflow:hidden}
 .quick-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}.quick-link{border:1px solid #e1e9f3;background:white;border-radius:17px;min-height:95px;padding:13px 6px;color:#17385c;font-size:12px;font-weight:750;box-shadow:0 5px 16px #10253c10}.quick-link span{display:block;font-size:27px;margin-bottom:8px}.header-menu{margin-left:auto;position:relative}.menu-toggle{border:1px solid #dce5ef;background:#f6f9fd;color:#143b62;border-radius:12px;padding:9px 12px;font-size:22px}.menu-popover{position:absolute;right:0;top:calc(100% + 9px);width:min(280px,85vw);background:#fff;border:1px solid #dce5ef;box-shadow:0 12px 35px #10253c35;border-radius:15px;padding:8px;z-index:30}.menu-popover[hidden]{display:none}.menu-popover button,.menu-popover a{display:block;width:100%;text-align:left;background:white;border:0;border-radius:9px;padding:12px;color:#143b62;text-decoration:none;font-size:14px}.menu-popover button:hover,.menu-popover a:hover{background:#edf3fa}.venmo-direct{background:#173f9c!important;color:white!important;border-color:#173f9c!important;margin-top:10px}.quick-link:focus-visible,.menu-toggle:focus-visible{outline:3px solid #d4a42e;outline-offset:2px}@media(max-width:390px){.quick-link{font-size:11px;padding:10px 4px}header .inner{gap:8px}header img{width:60px;height:60px}}
+
+/* Ebenezer teal theme — complements the warm church hero photograph */
+:root{--teal:#087f83;--teal-dark:#075b62;--teal-deep:#083f4b;--teal-light:#e4f6f4}
+body{background:linear-gradient(160deg,#d9f2ee 0%,#eefaf7 42%,#d7eceb 100%);color:#12363c}
+header{background:#f7fffd;border-bottom:1px solid #b9e3df}
+header h1{color:#075b62}header p{color:#47767a}
+.hero{background:#083f4b;box-shadow:0 18px 40px #064c5630}
+.hero .intro{background:linear-gradient(135deg,#07535c,#087f83)}
+.hero p{color:#e4f6f4}
+.panel{background:#fbfffe;border-color:#cde7e4;box-shadow:0 8px 28px #075b6210}
+.panel h2,.panel h3{color:#07535c}
+.schedule,.event{border-bottom-color:#d3eae7}
+.time,.event time,a{color:#087078}
+.welcome-strip{color:#075b62}
+.quick-link{background:#f8fffe;border-color:#b9e3df;color:#075b62;box-shadow:0 5px 16px #075b6214}
+.quick-link:hover,.quick-link:focus-visible{background:#e4f6f4}
+.menu-toggle{background:#e4f6f4;border-color:#a8d9d4;color:#075b62}
+.menu-popover{border-color:#b9e3df}
+.menu-popover button,.menu-popover a{color:#075b62}
+.menu-popover button:hover,.menu-popover a:hover{background:#e4f6f4}
+.ministry{background:linear-gradient(145deg,#087f83,#07535c)}
+.team-details{background:#e4f6f4}
+.btn{border-color:#a8d9d4;color:#075b62}
+.pill{background:#e4f6f4;color:#075b62}
+.status,.muted,.event p{color:#547477}
 </style>
 <!-- Google Analytics: tracks public page visits; does not measure exact home-screen installs. -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NY7D4R99S1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-NY7D4R99S1',{send_page_view:true});</script>

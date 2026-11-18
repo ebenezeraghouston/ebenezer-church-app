@@ -42,7 +42,7 @@ async function refreshAdmin(){
  if(!waiting.length)requests.textContent='No pending access requests.';
  for(const d of waiting){
  const data=d.data(),line=document.createElement('div');line.className='panel';line.style.margin='10px 0';
- const title=document.createElement('p');title.textContent=(data.name||'Member')+' — '+(data.email||'')+' | UID: '+d.id;line.append(title);
+ const title=document.createElement('p');title.textContent=(data.name||'Member')+' — '+(data.email||'');line.append(title);
  const btn=document.createElement('button');btn.className='btn';btn.textContent='Approve Member';line.append(btn);
  btn.addEventListener('click',async()=>{if(!confirm('Approve directory access for '+(data.email||d.id)+'?'))return;btn.disabled=true;try{await setDoc(doc(db,'approvedMembers',d.id),{approved:true,email:data.email||'',name:data.name||'',approvedAt:serverTimestamp()});await refreshAdmin();}catch(e){message('Approval failed: '+e.message);btn.disabled=false;}});
  requests.append(line);
@@ -62,7 +62,7 @@ async function updateUser(u){
  user=u;login.disabled=false;show(login,!u);show(logout,!!u);
  show(request,false);show(members,false);show(adminPanel,false);account.textContent='';
  if(!u){message('Sign in with Google to request access.');return;}
- account.textContent='Signed in: '+(u.email||'')+' | UID: '+u.uid;
+ account.textContent='Signed in: '+(u.email||'');
  isAdmin=u.uid===ADMIN_UID;isApproved=isAdmin;
  message('Checking private directory access…');
  try{

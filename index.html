@@ -65,7 +65,7 @@ function eventHTML(e){
  const img=e.flyer?`<a href="${escapeHTML(e.flyer)}" target="_blank" rel="noopener noreferrer" aria-label="View ${escapeHTML(e.title)} flyer"><img class="event-flyer" src="${escapeHTML(e.flyer)}" alt="${escapeHTML(e.title)} event flyer" loading="lazy"></a>`:'';
  const calendar=`<div class="calendar-actions"><button class="calendar-add" type="button" data-calendar-id="${escapeHTML(e.id||e.date+'-'+e.title)}">📅 Add to Calendar + Reminders</button></div>`;
  const signup=e.signup_url?`<p><a class="signup-link" href="${escapeHTML(e.signup_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(e.signup_label||'Food Sign-Up Sheet')} ↗</a></p>`:'';
- return `<article class="event"><time>${escapeHTML(fmtDate(e.date))}${when}</time><b>${escapeHTML(e.title)}</b><p>${escapeHTML(e.details||e.note||'')}</p>${img}${signup}${calendar}</article>;
+ return `<article class="event"><time>${escapeHTML(fmtDate(e.date))}${when}</time><b>${escapeHTML(e.title)}</b><p>${escapeHTML(e.details||e.note||'')}</p>${img}${signup}${calendar}</article>`;
 }
 let churchEvents=[];
 function icsEscape(s){return String(s||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;')}

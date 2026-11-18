@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function admin() { return signedIn() && request.auth.uid == 'xc2p3vvI9taVr4uPj1cW8n413oz1'; }
+    function approved() {
+      return admin() || (signedIn() &&
+        exists(/databases/$(database)/documents/approvedMembers/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/approvedMembers/$(request.auth.uid)).data.approved == true);
+    }
+    match /accessRequests/{uid} {
+      allow get: if admin() || (signedIn() && request.auth.uid == uid);
+      allow list: if admin();
+      allow create: if signedIn() && request.auth.uid == uid &&
+        request.resource.data.keys().hasOnly(['email','name','requestedAt']) &&
+        request.resource.data.email == request.auth.token.email &&
+        request.resource.data.name is string && request.resource.data.name.size() <= 120 &&
+        request.resource.data.requestedAt == request.time;
+      allow update, delete: if admin();
+    }
+    match /approvedMembers/{uid} {
+      allow get: if admin() || (signedIn() && request.auth.uid == uid);
+      allow list: if admin();
+      allow create, update: if admin() &&
+        request.resource.data.keys().hasOnly(['approved','email','name','approvedAt']) &&
+        request.resource.data.approved is bool &&
+        request.resource.data.email is string &&
+        request.resource.data.name is string;
+      allow delete: if admin();
+    }
+    match /directory/{entryId} {
+      allow read: if approved();
+      allow create, update: if admin() &&
+        request.resource.data.keys().hasOnly(['name','phone','email','family','notes']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120 &&
+        request.resource.data.phone is string && request.resource.data.phone.size() <= 60 &&
+        request.resource.data.email is string && request.resource.data.email.size() <= 150 &&
+        request.resource.data.family is string && request.resource.data.family.size() <= 200 &&
+        request.resource.data.notes is string && request.resource.data.notes.size() <= 300;
+      allow delete: if admin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

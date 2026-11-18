@@ -154,15 +154,42 @@ const pushStatus=document.getElementById('push-status');
 const pushButton=document.getElementById('enable-push');
 if('Notification' in window && Notification.permission==='granted')pushStatus.textContent='Browser permission is allowed. Tap Enable notifications to verify your OneSignal subscription.';
 let oneSignalLoading=null;
+let oneSignalReady=null;
 function loadOneSignal(){
  if(oneSignalLoading)return oneSignalLoading;
  oneSignalLoading=new Promise((resolve,reject)=>{
   if(window.OneSignalDeferred){resolve();return;}
   const s=document.createElement('script');s.src='https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';s.async=true;
-  s.onload=resolve;s.onerror=()=>reject(new Error('Unable to load OneSignal SDK'));
-  document.head.appendChild(s);
- });
- return oneSignalLoading;
+  s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+ });return oneSignalLoading;
+}
+function initializeOneSignal(){
+ if(oneSignalReady)return oneSignalReady;
+ oneSignalReady=(async()=>{
+  const workerUrl=new URL('OneSignalSDKWorker.js',document.baseURI);
+  const response=await fetch(workerUrl,{cache:'no-store'});
+  if(!response.ok)throw new Error('Notification worker HTTP '+response.status);
+  await loadOneSignal();
+  window.OneSignalDeferred=window.OneSignalDeferred||[];
+  return await new Promise((resolve,reject)=>{
+   window.OneSignalDeferred.push(async OneSignal=>{
+    try{
+     await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:workerUrl.pathname,serviceWorkerParam:{scope:new URL('./',document.baseURI).pathname}});
+     watchOneSignalMessages(OneSignal);
+     resolve(OneSignal);
+    }catch(error){reject(error)}
+   });
+  });
+ })();
+ oneSignalReady.catch(()=>{oneSignalReady=null;oneSignalLoading=null});
+ return oneSignalReady;
+}
+// Attach message listeners on page load, not only after tapping Enable.
+// This captures foreground pushes and click events whenever the SDK exposes them.
+if('Notification' in window && Notification.permission==='granted'){
+ initializeOneSignal().then(OneSignal=>{
+  if(OneSignal.User.PushSubscription.optedIn)pushStatus.textContent='Notifications enabled! Your device is subscribed.';
+ }).catch(error=>console.warn('OneSignal background initialization:',error));
 }
 pushButton.addEventListener('click',async()=>{
  if(!('Notification' in window)||!('serviceWorker' in navigator)){
@@ -170,28 +197,16 @@ pushButton.addEventListener('click',async()=>{
  }
  pushButton.disabled=true;pushStatus.textContent='Checking notification subscription…';
  try{
-  const workerUrl=new URL('OneSignalSDKWorker.js',document.baseURI);
-  const workerCheck=await fetch(workerUrl,{cache:'no-store'});
-  if(!workerCheck.ok)throw new Error('Notification worker not available (HTTP '+workerCheck.status+').');
-  await loadOneSignal();
-  window.OneSignalDeferred=window.OneSignalDeferred||[];
-  await new Promise((resolve,reject)=>{
-   window.OneSignalDeferred.push(async OneSignal=>{
-    try{
-     await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:workerUrl.pathname,serviceWorkerParam:{scope:new URL('./',document.baseURI).pathname}});watchOneSignalMessages(OneSignal);
-     await OneSignal.Notifications.requestPermission();
-     if(Notification.permission!=='granted'){
-      pushStatus.textContent='Notifications are blocked or not allowed in browser settings.';resolve();return;
-     }
-     const subscribed=OneSignal.User.PushSubscription.optedIn;
-     pushStatus.textContent=subscribed?'Notifications enabled! Your device is subscribed.':'Permission is allowed, but this device is not subscribed yet. Check OneSignal Web Push site URL and browser settings.';
-     resolve();
-    }catch(error){reject(error)}
-   });
-  });
+  const OneSignal=await initializeOneSignal();
+  await OneSignal.Notifications.requestPermission();
+  if(Notification.permission!=='granted'){
+   pushStatus.textContent='Notifications are blocked or not allowed in browser settings.';
+  }else{
+   pushStatus.textContent=OneSignal.User.PushSubscription.optedIn?'Notifications enabled! Your device is subscribed.':'Browser permission is allowed, but the device is not yet subscribed.';
+  }
  }catch(error){
   console.error('Ebenezer AG push setup:',error);
-  pushStatus.textContent='Notification setup failed: '+(error&&error.message?error.message:'Unknown error')+'. Check OneSignal Web Push site URL and worker configuration.';
+  pushStatus.textContent='Notification setup failed: '+(error?.message||'Unknown error');
  }finally{pushButton.disabled=false}
 });
 

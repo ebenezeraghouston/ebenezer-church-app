@@ -5,6 +5,7 @@ import uuid
 from datetime import date, datetime
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +37,10 @@ def main():
         label = 'Tomorrow' if days == 1 else 'Today'
         event_id = event.get('id', event['title'] + event['date'])
         token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{start}/{days}')
-        payload = {'app_id': APP_ID, 'included_segments': ['Subscribed Users'], 'target_channel': 'push', 'headings': {'en': f'{label}: {event["title"]}'}, 'contents': {'en': f'{event.get("time", "Time to be announced")} · {event.get("note", "See details in church app.")}'}, 'url': BASE, 'idempotency_key': str(token), 'ttl': 3600}
+        title = f'{label}: {event["title"]}'
+        body = f'{event.get("time", "Time to be announced")} · {event.get("note", "See details in church app.")}'
+        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
+        payload = {'app_id': APP_ID, 'included_segments': ['Subscribed Users'], 'target_channel': 'push', 'headings': {'en': f'{label}: {event["title"]}'}, 'contents': {'en': f'{event.get("time", "Time to be announced")} · {event.get("note", "See details in church app.")}'}, 'url': notice_url, 'idempotency_key': str(token), 'ttl': 3600}
         count += 1
         print(f'{label}: {event["title"]} ({start})', flush=True)
         if not args.dry_run:

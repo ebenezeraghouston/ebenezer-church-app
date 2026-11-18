@@ -1,4 +1,4 @@
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import {initializeApp,getApps,getApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
 import {getAuth,signInAnonymously,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import {getFirestore,collection,addDoc,getDocs,query,where,doc,updateDoc,serverTimestamp,Timestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 const cfg={apiKey:"AIzaSyDqRQoIYmEpEaK0-qFPuQeHU9YlPdREoF4",authDomain:"ebenezer-ag-church-app.firebaseapp.com",projectId:"ebenezer-ag-church-app",appId:"1:174964350833:web:8a8b54d382410f49d560d0"};
@@ -29,6 +29,7 @@ async function refreshPending(){
  }catch(e){pending.textContent='Could not load pending requests: '+e.message;}
 }
 window.addEventListener('ebenezer-auth-change',e=>{admin=!!e.detail.admin;adminPanel.hidden=!admin;if(admin)refreshPending();});
+if(getApps().some(a=>a.name==='[DEFAULT]'))onAuthStateChanged(getAuth(getApp()),u=>{admin=u?.uid==='xc2p3vvI9taVr4uPj1cW8n413oz1';adminPanel.hidden=!admin;if(admin)refreshPending();});
 onAuthStateChanged(auth,async u=>{if(!u){try{await signInAnonymously(auth)}catch(e){status.textContent='Prayer requests are unavailable until anonymous sign-in is enabled in Firebase: '+e.message;}return;}ready=true;refresh();});
 $('prayer-form').addEventListener('submit',async e=>{e.preventDefault();if(!ready){status.textContent='Please wait for the connection.';return;}const input=$('prayer-message'),message=input.value.trim(),button=$('prayer-submit');if(message.length<10||message.length>500)return;button.disabled=true;
 try{await addDoc(collection(db,'prayerRequests'),{message,status:'pending',createdAt:serverTimestamp(),expiresAt:Timestamp.fromMillis(Date.now()+86400000),submitterUid:auth.currentUser.uid});input.value='';status.textContent='Prayer request submitted for administrator approval. It will not be shared until approved.';}catch(err){status.textContent='Could not submit: '+err.message;}finally{button.disabled=false;}});

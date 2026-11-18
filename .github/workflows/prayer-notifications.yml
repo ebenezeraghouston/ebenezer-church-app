@@ -1,0 +1,25 @@
+name: Prayer Requests - Notify and Expire
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: prayer-notifications
+  cancel-in-progress: false
+jobs:
+  prayer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Firebase Admin SDK
+        run: pip install 'firebase-admin>=6.5,<8'
+      - name: Notify approved prayer requests and delete expired requests
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+        run: python scripts/send_prayer_notifications.py

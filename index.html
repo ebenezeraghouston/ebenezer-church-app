@@ -97,7 +97,28 @@ function renderHomeMonth(){
 }
 document.getElementById('month-prev').addEventListener('click',()=>{visibleMonth=new Date(visibleMonth.getFullYear(),visibleMonth.getMonth()-1,1);renderHomeMonth()});
 document.getElementById('month-next').addEventListener('click',()=>{visibleMonth=new Date(visibleMonth.getFullYear(),visibleMonth.getMonth()+1,1);renderHomeMonth()});
-fetch('events.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Failed to load');return r.json()}).then(data=>{churchEvents=data;const today=new Date().toISOString().slice(0,10);const upcoming=data.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));document.querySelector('#event-list').innerHTML=data.map(eventHTML).join('')||'<p>No events listed.</p>';renderHomeMonth();document.querySelector('#notification-events').innerHTML=upcoming.slice(0,5).map(eventHTML).join('')||'<p>No upcoming events currently listed.</p>'}).catch(()=>{['event-list','home-events','notification-events'].forEach(id=>document.getElementById(id).textContent='Events could not be loaded. Please reconnect and try again.')});
+async function loadChurchEvents(){
+ const eventList=document.getElementById('event-list');
+ const homeEvents=document.getElementById('home-events');
+ const notificationEvents=document.getElementById('notification-events');
+ try{
+  const response=await fetch(new URL('events.json?v=20261118-2',document.baseURI),{cache:'no-store'});
+  if(!response.ok)throw new Error('Events server returned HTTP '+response.status);
+  const data=await response.json();
+  if(!Array.isArray(data))throw new Error('Events data is not a list');
+  churchEvents=data;
+  const today=new Date().toLocaleDateString('en-CA');
+  const upcoming=data.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  eventList.innerHTML=data.map(eventHTML).join('')||'<p>No events listed.</p>';
+  try{renderHomeMonth()}catch(error){console.error('Monthly events display:',error);homeEvents.innerHTML=upcoming.slice(0,5).map(eventHTML).join('')||'<p>No upcoming events.</p>'}
+  notificationEvents.innerHTML=upcoming.slice(0,5).map(eventHTML).join('')||'<p>No upcoming events currently listed.</p>';
+ }catch(error){
+  console.error('Church events load failed:',error);
+  const message='Unable to load events ('+error.message+'). Please refresh the app.';
+  [eventList,homeEvents,notificationEvents].forEach(el=>{if(el)el.textContent=message});
+ }
+}
+loadChurchEvents();
 const ministryData=[
 {name:'Church Board',symbol:'🏛',lines:['Secretary: Sajan Simon','Joint Secretary: Liju Varkey','Treasurer: George Varghese','Joint Treasurer: Jimmy Emmanuel','Board Member: Tony Pappan','Board Member: Joel John']},
 {name:'Sunday School',symbol:'📖',lines:['Sunday School & JBQ Coordinator: Serena Jacob']},

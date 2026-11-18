@@ -32,11 +32,17 @@ header h1{color:#075b62}header p{color:#47767a}
 .btn{border-color:#a8d9d4;color:#075b62}
 .pill{background:#e4f6f4;color:#075b62}
 .status,.muted,.event p{color:#547477}
+
+/* Keep the church name on one line on phone screens. */
+header .inner>div:nth-child(2){min-width:0;flex:1}
+header h1{white-space:nowrap;letter-spacing:-.35px}
+header .header-menu{flex-shrink:0}
+@media(max-width:600px){header .inner{padding:13px 10px;gap:7px}header img{width:48px;height:48px;padding:3px;flex-shrink:0}header h1{font-size:clamp(10px,3vw,15px);letter-spacing:-.5px}header p{font-size:clamp(10px,2.7vw,12px)}header .menu-toggle{padding:6px 8px;font-size:19px}}
 </style>
 <!-- Google Analytics: tracks public page visits; does not measure exact home-screen installs. -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NY7D4R99S1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-NY7D4R99S1',{send_page_view:true});</script>
 </head><body>
-<header><div class="inner"><img src="church-logo-new.png" alt="Ebenezer Assembly of God Houston church logo"><div><h1>Ebenezer Assembly of God</h1><p>Houston, Texas • Worship. Grow. Serve.</p></div><div class="header-menu"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open app menu" aria-expanded="false" aria-controls="app-menu">☰</button><div class="menu-popover" id="app-menu" hidden><button data-tab="home">⌂ Home</button><button data-tab="events">▦ Events</button><button data-tab="ministries">♧ Ministries</button><button data-tab="giving">♡ Giving</button><button data-tab="pastors">♙ Meet the Pastors</button><button data-tab="notifications">🔔 Notifications</button><button data-tab="directory">🔒 Church Directory</button><button data-tab="prayer">🙏 Prayer Requests</button><a href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">↗ Open Venmo</a></div></div></div></header>
+<header><div class="inner"><img src="church-logo-new.png" alt="Ebenezer Assembly of God Houston church logo"><div><h1>Ebenezer Assembly of God</h1><p>Worship. Grow. Serve.</p></div><div class="header-menu"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open app menu" aria-expanded="false" aria-controls="app-menu">☰</button><div class="menu-popover" id="app-menu" hidden><button data-tab="home">⌂ Home</button><button data-tab="events">▦ Events</button><button data-tab="ministries">♧ Ministries</button><button data-tab="giving">♡ Giving</button><button data-tab="pastors">♙ Meet the Pastors</button><button data-tab="notifications">🔔 Notifications</button><button data-tab="directory">🔒 Church Directory</button><button data-tab="prayer">🙏 Prayer Requests</button><a href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">↗ Open Venmo</a></div></div></div></header>
 <div id="install-popup" role="dialog" aria-modal="true" aria-labelledby="install-popup-title" hidden style="position:fixed;inset:0;z-index:1000;background:#071b35a6;align-items:center;justify-content:center;padding:20px">
 <div style="position:relative;width:100%;max-width:390px;background:white;border-radius:22px;padding:27px 23px;box-shadow:0 18px 60px #071b3540;text-align:center;color:#075b62">
 <button type="button" id="install-popup-close" aria-label="Close installation reminder" style="position:absolute;right:13px;top:10px;border:0;background:transparent;font-size:26px;color:#526b76">×</button>

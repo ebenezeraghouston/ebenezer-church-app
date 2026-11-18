@@ -48,7 +48,7 @@ header h1{color:#075b62}header p{color:#47767a}
 <section class="page" id="ministries"><div class="panel" style="background:#0e2341;color:white"><span class="eyebrow">Connect • Serve • Grow</span><h2 style="font-size:27px;margin:9px 0 17px">Church Ministries</h2><div class="cards" id="ministry-cards"></div><div id="ministry-details" class="team-details" style="color:#13233b" aria-live="polite"></div><p style="margin:22px 0 0"><a class="gold" href="mailto:ebaghouston@gmail.com?subject=I%20Would%20Like%20to%20Serve%20-%20Ebenezer%20AG">🤝 If You'd Like to Serve, Please Let Us Know →</a></p></div><div class="panel"><h2>Other Coordinators & Ministry Associates</h2><div id="other-leaders"></div></div></section>
 <section class="page" id="giving"><div class="panel"><h2>❤️ Giving</h2><p>Thank you for supporting the ministry of Ebenezer Assembly of God.</p><h3>Zelle</h3><p>Use the church's previously provided Zelle number:</p><p><strong id="zelle-number">417-274-1156</strong></p><button class="btn" id="copy-zelle">Copy Zelle number</button><h3>Venmo</h3><p><strong>@Ebenezer-AG</strong></p><a class="btn venmo-direct" href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">Open Venmo</a><p class="status">Confirm the recipient's identity with the church before sending a payment. Payments are processed outside this app.</p></div></section>
 <section class="page" id="pastors"><div class="panel"><h2>⛪ Meet the Pastors</h2><div class="pastor"><img src="assets/pastor-family.jpg" alt="Senior Pastor and family"><div><span class="pill">Senior Pastor</span><h3>Pastor Alex Ramani</h3><p>Welcome to Ebenezer Assembly of God. We invite you to worship and grow with us.</p></div></div></div><div class="panel"><h2>Ministry Associates</h2><p><strong>Malayalam:</strong> Pr. John Lal</p><p><strong>English:</strong> Joel John</p><p><strong>Spanish:</strong> Pr. Carlos Aponte</p></div></section>
-<section class="page" id="notifications"><div class="panel"><h2>🔔 Notifications</h2><p>Stay informed about upcoming services, events, and announcements.</p><p id="push-status" class="status">Push notification setup must be verified after this new app is published.</p><button class="btn" id="enable-push">Enable notifications</button><p class="status">Automatic event reminders are scheduled for 9 AM Houston time on the day before and the day of each event. Enable notifications on your device to receive them. Delivery requires OneSignal and GitHub Actions to be configured and tested.</p></div><div class="panel"><h2>Upcoming Events</h2><div id="notification-events"></div></div></section>
+<section class="page" id="notifications"><div class="panel"><h2>🔔 Notifications</h2><p>Stay informed about upcoming services, events, and announcements.</p><p id="push-status" class="status">Push notification setup must be verified after this new app is published.</p><button class="btn" id="enable-push">Enable notifications</button><p class="status">Automatic event reminders are scheduled for 9 AM Houston time on the day before and the day of each event. Enable notifications on your device to receive them. Delivery requires OneSignal and GitHub Actions to be configured and tested.</p></div><div class="panel"><h2>Recent Notifications</h2><p class="status">Notifications opened on this device are saved here. Older alerts received before this update may not appear.</p><div id="notification-inbox"></div></div><div class="panel"><h2>Upcoming Events</h2><div id="notification-events"></div></div></section>
 <footer>Ebenezer Assembly of God • Houston, Texas • <a href="mailto:ebaghouston@gmail.com">Contact the church</a></footer>
 </main>
 
@@ -99,6 +99,54 @@ const ministryData=[
 const cards=document.getElementById('ministry-cards'),detail=document.getElementById('ministry-details');ministryData.forEach((m,i)=>{let b=document.createElement('button');b.className='ministry';b.innerHTML=`<span class="symbol">${escapeHTML(m.symbol)}</span><b>${escapeHTML(m.name)}</b><small>View Team</small>`;b.onclick=()=>{detail.classList.add('show');detail.innerHTML='<h3>'+escapeHTML(m.name)+'</h3>'+m.lines.map(x=>'<p>'+escapeHTML(x)+'</p>').join('');detail.scrollIntoView({behavior:'smooth',block:'nearest'})};cards.append(b)});
 document.getElementById('other-leaders').innerHTML=[['Ministry Associates','Malayalam: Pr. John Lal','English: Joel John','Spanish: Pr. Carlos Aponte'],['Set Apart for English Ministry','Albin John','Jeff Joseph'],['Set Apart for Spanish Ministry','Abin Varghese','Tomson Chacko'],['Other Coordinators','Prayer: Omana John','Food: Cicily Joseph','Facilities: Pr. Carlos Aponte & Thomas Abraham','Retreat: Jimmy Emmanuel','Auditor: Mathew P. Chacko']].map(g=>'<h3>'+escapeHTML(g[0])+'</h3>'+g.slice(1).map(x=>'<p>'+escapeHTML(x)+'</p>').join('')).join('');
 document.getElementById('copy-zelle').onclick=()=>navigator.clipboard.writeText('4172741156').then(()=>{document.getElementById('copy-zelle').textContent='Copied!'}).catch(()=>{document.getElementById('copy-zelle').textContent='Please copy the number above'});
+
+// Keep a local, device-specific inbox for opened and foreground OneSignal messages.
+const inboxElement=document.getElementById('notification-inbox');
+const inboxStorageKey='ebenezer-ag-notification-inbox-v1';
+function readInbox(){try{const items=JSON.parse(localStorage.getItem(inboxStorageKey)||'[]');return Array.isArray(items)?items:[]}catch{return []}}
+function renderInbox(){
+ const messages=readInbox();
+ inboxElement.replaceChildren();
+ if(!messages.length){const p=document.createElement('p');p.className='muted';p.textContent='No notifications saved on this device yet.';inboxElement.append(p);return}
+ messages.forEach(m=>{
+  const article=document.createElement('article');article.className='event';
+  const title=document.createElement('h3');title.textContent=m.title||'Church Notification';
+  const body=document.createElement('p');body.textContent=m.body||'';
+  const when=document.createElement('small');when.className='muted';when.textContent=new Date(m.at).toLocaleString();
+  article.append(title,body,when);inboxElement.append(article);
+ });
+}
+function saveNotice(title,body,id){
+ if(!title&&!body)return;
+ const messages=readInbox();const key=id||title+'|'+body;
+ const filtered=messages.filter(m=>m.key!==key);
+ filtered.unshift({key,title:String(title||'Church Notification'),body:String(body||''),at:Date.now()});
+ try{localStorage.setItem(inboxStorageKey,JSON.stringify(filtered.slice(0,40)))}catch{}
+ renderInbox();
+}
+renderInbox();
+// Reminder URLs carry their own message so tapping a push reliably shows it.
+function readNotificationLink(){
+ const url=new URL(location.href);
+ const title=url.searchParams.get('notice_title'),body=url.searchParams.get('notice_body');
+ if(title||body){saveNotice(title,body,url.searchParams.get('notice_id'));showTab('notifications');
+ url.searchParams.delete('notice_title');url.searchParams.delete('notice_body');url.searchParams.delete('notice_id');
+ history.replaceState(null,'',url.pathname+url.search+'#notifications');
+ }
+}
+readNotificationLink();
+function watchOneSignalMessages(OneSignal){
+ if(window.ebenezerOneSignalWatch)return;
+ window.ebenezerOneSignalWatch=true;
+ OneSignal.Notifications.addEventListener('click',e=>{
+  const n=e.notification||{};saveNotice(n.title,n.body,n.notificationId||n.id);
+  showTab('notifications');
+ });
+ OneSignal.Notifications.addEventListener('foregroundWillDisplay',e=>{
+  const n=e.notification||{};saveNotice(n.title,n.body,n.notificationId||n.id);
+ });
+}
+
 // OneSignal requires a valid site configuration and successful deployment to the original HTTPS URL.
 // This new public app intentionally includes no historical notification inbox or member data.
 const ONESIGNAL_APP_ID='85bfa892-43b6-40ec-8f07-255f95f6fd43';
@@ -130,7 +178,7 @@ pushButton.addEventListener('click',async()=>{
   await new Promise((resolve,reject)=>{
    window.OneSignalDeferred.push(async OneSignal=>{
     try{
-     await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:workerUrl.pathname,serviceWorkerParam:{scope:new URL('./',document.baseURI).pathname}});
+     await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:workerUrl.pathname,serviceWorkerParam:{scope:new URL('./',document.baseURI).pathname}});watchOneSignalMessages(OneSignal);
      await OneSignal.Notifications.requestPermission();
      if(Notification.permission!=='granted'){
       pushStatus.textContent='Notifications are blocked or not allowed in browser settings.';resolve();return;

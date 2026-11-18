@@ -41,7 +41,7 @@ service cloud.firestore {
       allow delete: if admin();
     }
     match /prayerRequests/{requestId} {
-      allow create: if signedIn() &&
+      allow create: if approved() && request.auth.token.firebase.sign_in_provider == 'google.com' &&
         request.resource.data.keys().hasOnly(['message','status','createdAt','expiresAt','submitterUid']) &&
         request.resource.data.message is string &&
         request.resource.data.message.size() >= 10 &&
@@ -52,7 +52,7 @@ service cloud.firestore {
         request.resource.data.expiresAt is timestamp &&
         request.resource.data.expiresAt > request.time &&
         request.resource.data.expiresAt < request.time + duration.value(25, 'h');
-      allow get, list: if admin() || resource.data.status == 'approved';
+      allow get, list: if admin() || (approved() && resource.data.status == 'approved');
       allow update: if admin() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewedAt','expiresAt']) &&
         request.resource.data.status in ['approved','rejected'] &&

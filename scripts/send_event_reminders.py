@@ -43,6 +43,8 @@ def main():
             raise RuntimeError('OneSignal notification not accepted: ' + str(result.get('errors', 'unknown error')))
         print('OneSignal accepted notification:', result['id'])
     for event in events:
+        if not (now.hour == 9 and now.minute < 20) and not args.dry_run:
+            continue
         start = date.fromisoformat(event['date'])
         days = (start - today).days
         if days not in (0, 1) or event.get('reminders') is False:

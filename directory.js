@@ -59,6 +59,7 @@ async function refreshAdmin(){
  }catch(e){requests.textContent='Could not load requests: '+e.message;}
 }
 async function updateUser(u){
+ window.dispatchEvent(new CustomEvent('ebenezer-auth-change',{detail:{admin:u?.uid===ADMIN_UID}}));
  user=u;login.disabled=false;show(login,!u);show(logout,!!u);
  show(request,false);show(members,false);show(adminPanel,false);account.textContent='';
  if(!u){message('Sign in with Google to request access.');return;}

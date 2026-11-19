@@ -53,23 +53,6 @@ def main():
         if not any(item.get('id') == str(token) for item in history):
             history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id']})
             history_changed = True
-    for event in events:
-        if not (now.hour == 9 and now.minute < 20) and not args.dry_run:
-            continue
-        start = date.fromisoformat(event['date'])
-        days = (start - today).days
-        if days not in (0, 1) or event.get('reminders') is False:
-            continue
-        if days == 0 and not args.dry_run and event.get('start_local'):
-            if now.replace(tzinfo=None) >= datetime.fromisoformat(event['start_local']):
-                continue
-        label = 'Tomorrow' if days == 1 else 'Today'
-        event_id = event.get('id', event['title'] + event['date'])
-        token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{start}/{days}')
-        title = f'{label}: {event["title"]}'
-        body = f'{event.get("time", "Time to be announced")} · {event.get("note", "See details in church app.")}'
-        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
-        send(title, body, token, notice_url)
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:

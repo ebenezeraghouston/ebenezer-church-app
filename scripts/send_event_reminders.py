@@ -67,7 +67,7 @@ def main():
                 if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
                     continue
                 event_id = event.get('id', event['title'] + event['date'])
-                token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.date()}/{minutes}min')
+                token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/{minutes}min')
                 title = label + ': ' + event['title']
                 body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
                 notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'

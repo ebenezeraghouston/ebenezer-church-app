@@ -6,7 +6,7 @@ const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg),auth=getAu
 const $=id=>document.getElementById(id),status=$('prayer-status'),list=$('prayer-list'),pending=$('prayer-pending'),adminPanel=$('prayer-admin');
 let ready=false,admin=false,approved=false,authSequence=0;
 const form=$('prayer-form'),submit=$('prayer-submit');
-function setAccess(canSubmit){form.hidden=!canSubmit;submit.disabled=!canSubmit;list.parentElement.hidden=!canSubmit;}
+function setAccess(canSubmit){form.hidden=!canSubmit;submit.disabled=!canSubmit;list.parentElement.hidden=false;}
 setAccess(false);
 function readIds(){try{return JSON.parse(localStorage.getItem('prayer-read')||'[]')}catch{return []}}
 function markRead(id){try{localStorage.setItem('prayer-read',JSON.stringify([...new Set([...readIds(),id])].slice(-200)))}catch{}refresh();}
@@ -32,19 +32,20 @@ async function refreshPending(){
 }
 onAuthStateChanged(auth,async u=>{
  const seq=++authSequence;ready=false;approved=false;admin=false;setAccess(false);adminPanel.hidden=true;
- if(!u){status.textContent='Please sign in with an approved Google account in the Church Directory to submit or view prayer requests.';return;}
+ if(!u){await refresh();return;}
  if(u.isAnonymous || !u.providerData.some(p=>p.providerId==='google.com')){
-  status.textContent='Prayer requests require an approved Google account. Please sign in through the Church Directory.';return;
+  await refresh();return;
  }
  admin=u.uid==='xc2p3vvI9taVr4uPj1cW8n413oz1';
  try{
   if(!admin){const docSnap=await getDoc(doc(db,'approvedMembers',u.uid));approved=docSnap.exists()&&docSnap.data().approved===true;}
   else approved=true;
   if(seq!==authSequence)return;
-  if(!approved){status.textContent='You are not an authorized user. Please request approval in the Church Directory.';return;}
+  if(!approved){await refresh();return;}
   ready=true;setAccess(true);adminPanel.hidden=!admin;await refresh();
- }catch(e){if(seq===authSequence)status.textContent='Unable to verify approved membership: '+e.message;}
+ }catch(e){if(seq===authSequence)await refresh();}
 });
 $('prayer-form').addEventListener('submit',async e=>{e.preventDefault();if(!ready||!approved||!auth.currentUser){status.textContent='Only approved Google members can submit prayer requests.';return;}const input=$('prayer-message'),message=input.value.trim(),button=$('prayer-submit');if(message.length<10||message.length>500)return;button.disabled=true;
 try{await addDoc(collection(db,'prayerRequests'),{message,status:'pending',createdAt:serverTimestamp(),expiresAt:Timestamp.fromMillis(Date.now()+86400000),submitterUid:auth.currentUser.uid});input.value='';status.textContent='Prayer request submitted for administrator approval. It will not be shared until approved.';}catch(err){status.textContent='Could not submit: '+err.message;}finally{button.disabled=false;}});
 $('prayer-refresh').addEventListener('click',refresh);
+refresh();

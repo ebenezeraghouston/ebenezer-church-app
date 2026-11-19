@@ -55,7 +55,7 @@ def main():
         url = "https://www.youtube.com/watch?v=" + vid
         payload = {
             "app_id": APP_ID,
-            "included_segments": ["Subscribed Users"],
+            "included_segments": ["Total Subscriptions"],
             "target_channel": "push",
             "headings": {"en": "🔴 Ebenezer AG is LIVE!"},
             "contents": {"en": "Join our livestream: " + title[:110]},

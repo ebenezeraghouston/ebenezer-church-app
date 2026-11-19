@@ -35,7 +35,7 @@ def main():
     original_count = len(history)
     history = [item for item in history if item.get('sent_at') and timedelta(0) <= now - datetime.fromisoformat(item['sent_at']) < timedelta(days=14)]
     history_changed = len(history) != original_count and not args.dry_run
-    def send(title, body, token, url):
+    def send(title, body, token, url, expires_at=None):
         nonlocal count, history_changed
         count += 1
         print(f'{title}: {body}', flush=True)
@@ -52,7 +52,7 @@ def main():
             raise RuntimeError('OneSignal notification not accepted: ' + str(result.get('errors', 'unknown error')))
         print('OneSignal accepted notification:', result['id'])
         if not any(item.get('id') == str(token) for item in history):
-            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id']})
+            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at})
             history_changed = True
     if args.send_test:
         if args.dry_run:
@@ -89,8 +89,8 @@ def main():
                 token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/{minutes}min')
                 title = label + ': ' + event['title']
                 body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
-                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
-                send(title, body, token, notice_url)
+                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':event_start.isoformat()}) + '#notifications'
+                send(title, body, token, notice_url, event_start.isoformat())
 
     # Recurring meetings match the times shown on the church app homepage.
     weekly = [
@@ -116,8 +116,8 @@ def main():
             title = label + ': ' + meeting['title']
             body = meeting['time'] + ' Houston time · ' + meeting['note']
             token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{meeting_start.date()}/{minutes}min')
-            notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
-            send(title, body, token, notice_url)
+            notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':meeting_start.isoformat()}) + '#notifications'
+            send(title, body, token, notice_url, meeting_start.isoformat())
     if history_changed:
         history_path.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'{today}: {count} reminder(s) {"previewed" if args.dry_run else "processed"}.')

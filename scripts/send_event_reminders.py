@@ -67,6 +67,21 @@ def main():
         body = f'{event.get("time", "Time to be announced")} · {event.get("note", "See details in church app.")}'
         notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
         send(title, body, token, notice_url)
+    # Send 30-minute reminders for dated events with an exact start time.
+    # Events with no confirmed start_local are intentionally excluded.
+    for event in events:
+        if event.get('reminders') is False or not event.get('start_local'):
+            continue
+        event_start = datetime.fromisoformat(event['start_local']).replace(tzinfo=ZoneInfo('America/Chicago'))
+        reminder_at = event_start - timedelta(minutes=30)
+        if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
+            continue
+        event_id = event.get('id', event['title'] + event['date'])
+        token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.date()}/30min')
+        title = 'Starting in 30 minutes: ' + event['title']
+        body = event.get('time', '') + ' · ' + event.get('note', 'See details in church app.')
+        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
+        send(title, body, token, notice_url)
     # Recurring weekly meetings are based on the published church homepage schedule.
     # Send during a 20-minute window starting 30 minutes before the meeting.
     # Idempotency keys prevent duplicate pushes from overlapping scheduled runs.

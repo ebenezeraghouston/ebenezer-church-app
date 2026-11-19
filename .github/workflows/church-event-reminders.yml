@@ -1,11 +1,9 @@
 name: Church Event Reminders (Day Before and Day Of)
 on:
   schedule:
-    # 9 AM CST (winter) and 9 AM CDT (summer). The script checks local time.
-    - cron: '0 14,15 * * *'
-    # Weekly Zoom meetings: 30 minutes before 10 AM Friday / 2 PM Mon–Thu.
-    # Cover CST and CDT, retry within a 20-minute window if GitHub runs late.
-    - cron: '30,40,50 14,15,18,19 * * 1-5'
+    # Check every 10 minutes for day-of/day-before and 30-minute reminders.
+    # GitHub scheduled runs may be delayed; the script checks Houston local time.
+    - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:

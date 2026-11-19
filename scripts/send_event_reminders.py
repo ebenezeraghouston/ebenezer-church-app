@@ -44,7 +44,7 @@ def main():
         if any(item.get('id') == str(token) for item in history):
             print('Already sent; skipping duplicate:', token)
             return
-        payload = {'app_id': APP_ID, 'included_segments': ['Subscribed Users'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token), 'ttl': 3600}
+        payload = {'app_id': APP_ID, 'included_segments': ['Total Subscriptions'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token), 'ttl': 3600}
         req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
         with urlopen(req, timeout=30) as resp:
             result = json.load(resp)

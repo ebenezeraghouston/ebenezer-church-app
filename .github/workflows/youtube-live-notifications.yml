@@ -1,0 +1,33 @@
+name: YouTube Live Notifications
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: youtube-live-notifications
+  cancel-in-progress: false
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check YouTube livestream and notify members
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+        run: python scripts/send_youtube_live_notifications.py
+      - name: Save livestream notification history
+        if: success()
+        run: |
+          if ! git diff --quiet -- youtube-live-state.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add youtube-live-state.json
+            git commit -m 'Track notified YouTube livestreams'
+            git push
+          fi

@@ -286,9 +286,20 @@ pushButton.addEventListener('click',async()=>{
   const OneSignal=await initializeOneSignal();
   await OneSignal.Notifications.requestPermission();
   if(Notification.permission!=='granted'){
-   pushStatus.textContent='Notifications are blocked or not allowed in browser settings.';
+   const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+   const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+   if(ios&&!standalone){
+    pushStatus.textContent='On iPhone: open this site in Safari, tap Share → Add to Home Screen, then open the installed app and enable notifications.';
+   }else if(Notification.permission==='denied'){
+    pushStatus.textContent=ios?'Notifications are blocked. Open iPhone Settings → Notifications → Ebenezer AG (or your installed app) → Allow Notifications, then reopen the app.':'Notifications are blocked for this site. In Chrome or Samsung Internet, open the site settings (lock/tune icon beside the address) → Permissions → Notifications → Allow. Also check phone Settings → Apps → your browser → Notifications, then reload the church app.';
+   }else{
+    pushStatus.textContent='Permission was not granted. Open the church app directly in Chrome on Android, or from the Home Screen on iPhone, tap Enable Notifications, and choose Allow when prompted. If no prompt appears, check browser site permissions.';
+   }
   }else{
-   pushStatus.textContent=OneSignal.User.PushSubscription.optedIn?'Notifications enabled! Your device is subscribed.':'Browser permission is allowed, but the device is not yet subscribed.';
+   if(!OneSignal.User.PushSubscription.optedIn){
+    try{await OneSignal.User.PushSubscription.optIn()}catch(error){console.warn('OneSignal opt-in:',error)}
+   }
+   pushStatus.textContent=OneSignal.User.PushSubscription.optedIn?'Notifications enabled! Your device is subscribed.':'Notifications are allowed, but subscription is still pending. Reload the app and try again; check that the browser permits notifications.';
   }
  }catch(error){
   console.error('Ebenezer AG push setup:',error);

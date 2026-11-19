@@ -49,7 +49,12 @@ def main():
         with urlopen(req, timeout=30) as resp:
             result = json.load(resp)
         if not result.get('id'):
-            raise RuntimeError('OneSignal notification not accepted: ' + str(result.get('errors', 'unknown error')))
+            errors = result.get('errors', 'unknown error')
+            error_text = str(errors).lower()
+            if 'all included players are not subscribed' in error_text or 'no subscribed' in error_text:
+                print('WARNING: OneSignal has no eligible subscribed devices for this push. No notification was sent; leaving it unrecorded so a later run can retry.', flush=True)
+                return False
+            raise RuntimeError('OneSignal notification not accepted: ' + str(errors))
         print('OneSignal accepted notification:', result['id'])
         if not any(item.get('id') == str(token) for item in history):
             history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at})
@@ -64,7 +69,7 @@ def main():
         send(title, body, token, notice_url)
         if history_changed:
             history_path.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print('Immediate push test submitted to OneSignal successfully.')
+        print('Push test finished. Check the lines above for OneSignal acceptance or a no-subscribers warning.')
         return
 
     # Late GitHub runs can still deliver, but never after the event begins.

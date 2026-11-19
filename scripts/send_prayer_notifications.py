@@ -28,7 +28,7 @@ def main():
         title='🙏 New Prayer Request'
         body='A prayer request has been approved. Open the church app to pray.'
         url='https://ebenezeraghouston.github.io/ebenezer-church-app/#prayer'
-        payload={'app_id':'85bfa892-43b6-40ec-8f07-255f95f6fd43','included_segments':['Subscribed Users'],'target_channel':'push','headings':{'en':title},'contents':{'en':body},'url':url,'idempotency_key':str(uuid.uuid5(uuid.NAMESPACE_URL,'prayer/'+snap.id)),'ttl':3600}
+        payload={'app_id':'85bfa892-43b6-40ec-8f07-255f95f6fd43','included_segments':['Total Subscriptions'],'target_channel':'push','headings':{'en':title},'contents':{'en':body},'url':url,'idempotency_key':str(uuid.uuid5(uuid.NAMESPACE_URL,'prayer/'+snap.id)),'ttl':3600}
         req=Request('https://api.onesignal.com/notifications',data=json.dumps(payload).encode(),headers={'Authorization':'Key '+key,'Content-Type':'application/json'},method='POST')
         with urlopen(req,timeout=30) as response:
             result=json.load(response)

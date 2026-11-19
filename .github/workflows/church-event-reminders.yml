@@ -1,9 +1,9 @@
 name: Church Event Reminders (Day Before and Day Of)
 on:
   schedule:
-    # Check every 10 minutes for day-of/day-before and 30-minute reminders.
+    # Check every 5 minutes for day-of/day-before and 30-minute reminders.
     # GitHub scheduled runs may be delayed; the script checks Houston local time.
-    - cron: '*/10 * * * *'
+    - cron: '2-59/5 * * * *'
   workflow_dispatch:
     inputs:
       send_test:

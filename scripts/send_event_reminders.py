@@ -73,6 +73,16 @@ def main():
                 notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
                 send(title, body, token, notice_url)
 
+    # One-time push test: Thursday, Nov 19, 2026 at 1:45 PM Houston time.
+    # The 20-minute window accommodates GitHub Actions' ten-minute cron and minor delays.
+    test_at = datetime(2026, 11, 19, 13, 45, tzinfo=ZoneInfo('America/Chicago'))
+    if test_at <= now < test_at + timedelta(minutes=20):
+        title = 'Test Reminder: 2:00 PM Zoom Prayer'
+        body = "Today's Women's Zoom Prayer starts at 2:00 PM Houston time. This is a test of church app notifications."
+        token = uuid.uuid5(uuid.NAMESPACE_URL, APP_ID + '/test/2026-11-19-1345-zoom-prayer')
+        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
+        send(title, body, token, notice_url)
+
     # Recurring meetings match the times shown on the church app homepage.
     weekly = [
         {'id':'womens-zoom-prayer','title':"Women's Zoom Prayer",'days':(0,1,2,3),'hour':14,'minute':0,'time':'2:00 PM','note':'Join the weekly Zoom prayer meeting.'},

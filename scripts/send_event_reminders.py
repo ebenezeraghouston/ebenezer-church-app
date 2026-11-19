@@ -67,6 +67,11 @@ def main():
         print('Immediate push test submitted to OneSignal successfully.')
         return
 
+    # Late GitHub runs can still deliver, but never after the event begins.
+    def reminder_due(reminder_at, event_start, minutes):
+        grace = timedelta(minutes=120 if minutes == 1440 else minutes)
+        return reminder_at <= now < min(reminder_at + grace, event_start)
+
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:
@@ -78,7 +83,7 @@ def main():
             for minutes in event.get('reminder_minutes', [1440, 60, 30]):
                 label = {1440: 'Tomorrow', 60: 'Starting in 1 hour', 30: 'Starting in 30 minutes'}.get(minutes, f'Starting in {minutes} minutes')
                 reminder_at = event_start - timedelta(minutes=minutes)
-                if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
+                if not reminder_due(reminder_at, event_start, minutes):
                     continue
                 event_id = event.get('id', event['title'] + event['date'])
                 token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/{minutes}min')
@@ -86,16 +91,6 @@ def main():
                 body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
                 notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
                 send(title, body, token, notice_url)
-
-    # One-time push test: Thursday, Nov 19, 2026 at 1:45 PM Houston time.
-    # The 20-minute window accommodates GitHub Actions' ten-minute cron and minor delays.
-    test_at = datetime(2026, 11, 19, 13, 45, tzinfo=ZoneInfo('America/Chicago'))
-    if test_at <= now < test_at + timedelta(minutes=20):
-        title = 'Test Reminder: 2:00 PM Zoom Prayer'
-        body = "Today's Women's Zoom Prayer starts at 2:00 PM Houston time. This is a test of church app notifications."
-        token = uuid.uuid5(uuid.NAMESPACE_URL, APP_ID + '/test/2026-11-19-1345-zoom-prayer')
-        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
-        send(title, body, token, notice_url)
 
     # Recurring meetings match the times shown on the church app homepage.
     weekly = [
@@ -116,7 +111,7 @@ def main():
             if meeting_start.weekday() not in meeting['days']:
                 continue
             reminder_at = meeting_start - timedelta(minutes=minutes)
-            if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
+            if not reminder_due(reminder_at, meeting_start, minutes):
                 continue
             title = label + ': ' + meeting['title']
             body = meeting['time'] + ' Houston time · ' + meeting['note']

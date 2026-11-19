@@ -72,6 +72,18 @@ def main():
         grace = timedelta(minutes=120 if minutes == 1440 else minutes)
         return reminder_at <= now < min(reminder_at + grace, event_start)
 
+    # Start alerts are eligible only during the first ten minutes of a service.
+    # A separate idempotency key prevents duplicate start alerts across workflow runs.
+    def send_started(name, event_start, event_id, note):
+        if not (event_start <= now < event_start + timedelta(minutes=10)):
+            return
+        title = name + ' Has Started!'
+        body = 'The service or event has started. Join us now! ' + note
+        token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/started')
+        expires_at = (event_start + timedelta(hours=1)).isoformat()
+        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':expires_at}) + '#notifications'
+        send(title, body, token, notice_url, expires_at)
+
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:
@@ -80,6 +92,7 @@ def main():
         start_times = event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else [])
         for start_text in start_times:
             event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
+            send_started(event['title'], event_start, event.get('id', event['title']), event.get('note', ''))
             for minutes in event.get('reminder_minutes', [1440, 60, 30]):
                 label = {1440: 'Tomorrow', 60: 'Starting in 1 hour', 30: 'Starting in 30 minutes'}.get(minutes, f'Starting in {minutes} minutes')
                 reminder_at = event_start - timedelta(minutes=minutes)
@@ -110,6 +123,8 @@ def main():
                 meeting_start += timedelta(days=1)
             if meeting_start.weekday() not in meeting['days']:
                 continue
+            if minutes == 60:
+                send_started(meeting['title'], meeting_start, meeting['id'], meeting['note'])
             reminder_at = meeting_start - timedelta(minutes=minutes)
             if not reminder_due(reminder_at, meeting_start, minutes):
                 continue

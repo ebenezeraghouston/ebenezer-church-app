@@ -42,17 +42,17 @@ service cloud.firestore {
       allow delete: if admin();
     }
     match /prayerRequests/{requestId} {
-      allow create: if approved() && request.auth.token.firebase.sign_in_provider == 'google.com' &&
-        request.resource.data.keys().hasOnly(['message','status','createdAt','expiresAt','submitterUid']) &&
+      allow create: if
+        request.resource.data.keys().hasOnly(['message','status','createdAt','expiresAt']) &&
         request.resource.data.message is string &&
         request.resource.data.message.size() >= 10 &&
         request.resource.data.message.size() <= 500 &&
         request.resource.data.status == 'pending' &&
         request.resource.data.createdAt == request.time &&
-        request.resource.data.submitterUid == request.auth.uid &&
         request.resource.data.expiresAt is timestamp &&
         request.resource.data.expiresAt > request.time &&
-        request.resource.data.expiresAt < request.time + duration.value(25, 'h');
+        request.resource.data.expiresAt > request.time + duration.value(29, 'd') &&
+        request.resource.data.expiresAt < request.time + duration.value(31, 'd');
       allow get, list: if admin() || resource.data.status == 'approved';
       allow update: if admin() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewedAt','expiresAt']) &&
@@ -60,7 +60,8 @@ service cloud.firestore {
         request.resource.data.reviewedAt == request.time &&
         request.resource.data.expiresAt is timestamp &&
         request.resource.data.expiresAt > request.time &&
-        request.resource.data.expiresAt < request.time + duration.value(25, 'h');
+        request.resource.data.expiresAt > request.time + duration.value(6, 'd') &&
+        request.resource.data.expiresAt < request.time + duration.value(8, 'd');
       allow delete: if admin();
     }
     match /{document=**} { allow read, write: if false; }

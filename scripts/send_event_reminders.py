@@ -56,19 +56,22 @@ def main():
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:
-        if event.get('reminders') is False or not event.get('start_local'):
+        if event.get('reminders') is False:
             continue
-        event_start = datetime.fromisoformat(event['start_local']).replace(tzinfo=ZoneInfo('America/Chicago'))
-        for minutes, label in [(1440, 'Tomorrow'), (60, 'Starting in 1 hour'), (30, 'Starting in 30 minutes')]:
-            reminder_at = event_start - timedelta(minutes=minutes)
-            if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
-                continue
-            event_id = event.get('id', event['title'] + event['date'])
-            token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.date()}/{minutes}min')
-            title = label + ': ' + event['title']
-            body = event.get('time', '') + ' · ' + event.get('note', 'See details in church app.')
-            notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
-            send(title, body, token, notice_url)
+        start_times = event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else [])
+        for start_text in start_times:
+            event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
+            for minutes in event.get('reminder_minutes', [1440, 60, 30]):
+                label = {1440: 'Tomorrow', 60: 'Starting in 1 hour', 30: 'Starting in 30 minutes'}.get(minutes, f'Starting in {minutes} minutes')
+                reminder_at = event_start - timedelta(minutes=minutes)
+                if not (reminder_at <= now < reminder_at + timedelta(minutes=20)):
+                    continue
+                event_id = event.get('id', event['title'] + event['date'])
+                token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.date()}/{minutes}min')
+                title = label + ': ' + event['title']
+                body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
+                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token)}) + '#notifications'
+                send(title, body, token, notice_url)
 
     # Recurring meetings match the times shown on the church app homepage.
     weekly = [

@@ -15,6 +15,7 @@ BASE = 'https://ebenezeraghouston.github.io/ebenezer-church-app/#events'
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--send-test', action='store_true', help='Send a one-time immediate test push, ignoring reminder schedule')
     parser.add_argument('--date', type=date.fromisoformat)
     parser.add_argument('--preview-time', help='Houston local HH:MM; dry run only')
     args = parser.parse_args()
@@ -53,6 +54,19 @@ def main():
         if not any(item.get('id') == str(token) for item in history):
             history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id']})
             history_changed = True
+    if args.send_test:
+        if args.dry_run:
+            parser.error('--send-test cannot be combined with --dry-run')
+        title = 'Ebenezer AG — Push Notification Test'
+        body = 'This is a test notification from the Ebenezer AG Church App. No action is needed.'
+        token = uuid.uuid4()
+        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title': title, 'notice_body': body, 'notice_id': str(token)}) + '#notifications'
+        send(title, body, token, notice_url)
+        if history_changed:
+            history_path.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        print('Immediate push test submitted to OneSignal successfully.')
+        return
+
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:

@@ -41,20 +41,6 @@ service cloud.firestore {
         request.resource.data.notes is string && request.resource.data.notes.size() <= 300;
       allow delete: if admin();
     }
-    // Each approved Google member can write only their own read receipts.
-    // Only the existing church administrator may list or view them.
-    match /notificationReceipts/{receiptId} {
-      allow get, list: if admin();
-      allow create: if approved() && request.auth.token.firebase.sign_in_provider == 'google.com' &&
-        request.resource.data.keys().hasOnly(['notificationId','title','memberUid','memberName','memberEmail','openedAt']) &&
-        request.resource.data.memberUid == request.auth.uid &&
-        request.resource.data.memberEmail == request.auth.token.email &&
-        request.resource.data.memberName is string && request.resource.data.memberName.size() <= 120 &&
-        request.resource.data.notificationId is string && request.resource.data.notificationId.size() > 0 && request.resource.data.notificationId.size() <= 200 &&
-        request.resource.data.title is string && request.resource.data.title.size() <= 200 &&
-        request.resource.data.openedAt == request.time;
-      allow update, delete: if false;
-    }
     match /prayerRequests/{requestId} {
       allow create: if approved() && request.auth.token.firebase.sign_in_provider == 'google.com' &&
         request.resource.data.keys().hasOnly(['message','status','createdAt','expiresAt','submitterUid']) &&

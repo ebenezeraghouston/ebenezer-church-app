@@ -6,6 +6,11 @@ on:
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
+      send_test:
+        description: 'Send a test push notification immediately to subscribed devices'
+        required: true
+        type: boolean
+        default: false
       dry_run:
         description: 'Preview reminders without sending notifications'
         required: true
@@ -41,11 +46,16 @@ jobs:
         env:
           ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
+          SEND_TEST: ${{ github.event.inputs.send_test }}
           PREVIEW_DATE: ${{ github.event.inputs.preview_date }}
           PREVIEW_TIME: ${{ github.event.inputs.preview_time }}
         run: |
           args=()
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$DRY_RUN" != "false" ]]; then args+=(--dry-run); fi
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$SEND_TEST" == "true" ]]; then
+            args+=(--send-test)
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$DRY_RUN" != "false" ]]; then
+            args+=(--dry-run)
+          fi
           if [[ -n "$PREVIEW_DATE" ]]; then args+=(--date "$PREVIEW_DATE"); fi
           if [[ -n "$PREVIEW_TIME" ]]; then args+=(--preview-time "$PREVIEW_TIME"); fi
           python scripts/send_event_reminders.py "${args[@]}"

@@ -28,20 +28,36 @@
     "date": "2026-11-27",
     "end": "2026-11-29",
     "title": "Fasting Prayer",
-    "time": "Friday & Saturday: 10:00 AM–12:00 PM and 7:00–9:00 PM; Sunday: Lord’s Table (time not listed)",
+    "time": "November 27–29: 10:00 AM–12:00 PM and 7:00–8:30 PM daily",
     "note": "All services at church",
-    "details": "November 27–29 at church. Friday and Saturday morning sessions: 10:00 AM–12:00 PM; evening sessions: 7:00–9:00 PM. Sunday: The Lord’s Table (time not specified on flyer).",
+    "details": "November 27–29 at church. Each day: morning fasting prayer 10:00 AM–12:00 PM and evening fasting prayer 7:00–8:30 PM. Sunday includes the Lord’s Table.",
     "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
-    "flyer": "flyers/fasting-prayer-nov27-29.png"
+    "flyer": "flyers/fasting-prayer-nov27-29.png",
+    "start_times_local": [
+      "2026-11-27T10:00:00",
+      "2026-11-27T19:00:00",
+      "2026-11-28T10:00:00",
+      "2026-11-28T19:00:00",
+      "2026-11-29T10:00:00",
+      "2026-11-29T19:00:00"
+    ],
+    "reminder_minutes": [
+      30
+    ]
   },
   {
     "id": "ag-fellowship-2026-12-06",
     "date": "2026-12-06",
     "title": "Combined AG Fellowship",
-    "time": "Time to be announced",
+    "time": "9:00 AM",
     "note": "At church",
     "details": "Join us for our combined AG Fellowship at Ebenezer Assembly of God.",
-    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047"
+    "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
+    "start_local": "2026-12-06T09:00:00",
+    "reminder_minutes": [
+      1440,
+      60
+    ]
   },
   {
     "id": "womens-fellowship-2026-12-12",
@@ -79,13 +95,17 @@
     "id": "year-end-2026-12-31",
     "date": "2026-12-31",
     "title": "Year-End Service",
-    "time": "Time to be announced",
+    "time": "9:30 PM",
     "note": "At church",
     "details": "Join us for our year-end worship service as we close 2026 together.",
     "location": "Ebenezer Assembly of God, 3350 Fuqua St, Houston, TX 77047",
     "flyer": "flyers/year-end-dec31.png",
     "signup_url": "https://docs.google.com/spreadsheets/d/16sAeqxQQlC_Hy_Yh2N73KC-rPtKajobOchnpKOPOnrc/edit?usp=sharing",
-    "signup_label": "Sign Up for Year-End Food"
+    "signup_label": "Sign Up for Year-End Food",
+    "start_local": "2026-12-31T21:30:00",
+    "reminder_minutes": [
+      60
+    ]
   },
   {
     "id": "fasting-prayer-2027-01-03",

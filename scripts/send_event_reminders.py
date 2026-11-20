@@ -45,7 +45,9 @@ def main():
             print('Already sent; skipping duplicate:', token)
             return
         payload = {'app_id': APP_ID, 'included_segments': ['Total Subscriptions'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token), 'ttl': 3600}
-        if scheduled_at and scheduled_at > now:\n            payload['send_after'] = scheduled_at.isoformat()\n        req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
+        if scheduled_at and scheduled_at > now:
+            payload['send_after'] = scheduled_at.isoformat()
+        req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
         with urlopen(req, timeout=30) as resp:
             result = json.load(resp)
         if not result.get('id'):

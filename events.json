@@ -108,17 +108,14 @@
     ]
   },
   {
-    "id": "fasting-prayer-2027-01-03",
-    "date": "2027-01-03",
-    "end": "2027-01-10",
-    "title": "Fasting Prayer",
-    "time": "Daily: Morning 10:00 AM–12:00 PM · Evening 7:00 PM–8:30 PM",
-    "note": "January 3–10 · Regular Sunday services continue January 3 · Regular weekly gatherings suspended January 4–10 · Sign-up sheet will be available",
-    "details": "January 3–10, 2027: Fasting prayer sessions are scheduled daily, morning 10:00 AM–12:00 PM and evening 7:00 PM–8:30 PM. Regular Sunday services will still take place on January 3. Regular weekly gatherings are suspended January 4–10; the fasting prayer sessions replace them. A sign-up sheet will be available. Location to be confirmed. Please note that the January 3 morning fasting prayer session overlaps the regular Sunday services; any adjustment to that session has not yet been confirmed.",
-    "flyer": "flyers/fasting-prayer-jan3-10.png",
+    "id": "fasting-prayer-2027-01-04",
+    "date": "2027-01-04",
+    "end": "2027-01-09",
+    "title": "6-Day Fasting Prayer",
+    "time": "January 4–9 daily · Morning 10:00 AM–12:00 PM · Evening 7:00–8:30 PM",
+    "note": "January 4–9 · Morning 10 AM–12 PM and evening 7–8:30 PM · No regular Monday–Friday meetings · Sign-up sheet to follow",
+    "details": "Join us for six days of fasting prayer, Monday, January 4 through Saturday, January 9, 2027. Morning sessions are 10:00 AM–12:00 PM and evening sessions are 7:00–8:30 PM each day. Regular Monday–Friday weekly gatherings are suspended during these dates. Sunday, January 3 and Sunday, January 10 have regular Sunday services. Sign-up sheet and fasting prayer location to be confirmed.",
     "start_times_local": [
-      "2027-01-03T10:00:00",
-      "2027-01-03T19:00:00",
       "2027-01-04T10:00:00",
       "2027-01-04T19:00:00",
       "2027-01-05T10:00:00",
@@ -130,9 +127,7 @@
       "2027-01-08T10:00:00",
       "2027-01-08T19:00:00",
       "2027-01-09T10:00:00",
-      "2027-01-09T19:00:00",
-      "2027-01-10T10:00:00",
-      "2027-01-10T19:00:00"
+      "2027-01-09T19:00:00"
     ],
     "reminder_minutes": [
       1440,

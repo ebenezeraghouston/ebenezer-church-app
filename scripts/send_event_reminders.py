@@ -83,7 +83,7 @@ def main():
         grace = timedelta(minutes=120 if minutes == 1440 else minutes)
         return reminder_at <= now < min(reminder_at + grace, event_start)
 
-    # Start alerts are eligible only during the first ten minutes of a service.
+    # Reminders stop strictly before the event starts; no new 'has started' alerts.\n    # Start alerts are eligible only during the first ten minutes of a service.
     # A separate idempotency key prevents duplicate start alerts across workflow runs.
     def send_started(name, event_start, event_id, note):
         if not (event_start <= now < event_start + timedelta(minutes=10)):
@@ -103,16 +103,16 @@ def main():
         start_times = event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else [])
         for start_text in start_times:
             event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
-            send_started(event['title'], event_start, event.get('id', event['title']), event.get('note', ''))
-            for minutes in event.get('reminder_minutes', [1440, 60, 30]):
-                label = {1440: 'Tomorrow', 60: 'Starting in 1 hour', 30: 'Starting in 30 minutes'}.get(minutes, f'Starting in {minutes} minutes')
+            # Do not send a notification at or after the start time.
+            for minutes in range(1440, 0, -60):
+                label = 'Tomorrow' if minutes == 1440 else f'Starting in {minutes // 60} hour' + ('' if minutes == 60 else 's')
                 reminder_at = event_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, event_start, minutes):
                     continue
                 event_id = event.get('id', event['title'] + event['date'])
                 token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/{minutes}min')
                 title = label + ': ' + event['title']
-                body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
+                body = (event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + ('FOOD SIGN-UP: Please sign up to bring a dish! GIFT EXCHANGE: Bring a gift ($25 maximum). Tap for the food sign-up link and details.' if event.get('id') == 'thanksgiving-2026-11-25' else event.get('note', 'See details in church app.')))
                 notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':event_start.isoformat()}) + '#notifications'
                 send(title, body, token, notice_url, event_start.isoformat(), reminder_at if reminder_at > now else None)
 
@@ -131,15 +131,9 @@ def main():
             meeting_start = (now + timedelta(days=days_ahead)).replace(hour=meeting['hour'], minute=meeting['minute'], second=0, microsecond=0)
             if meeting_start.weekday() not in meeting['days']:
                 continue
-            # Start notifications still require a run at the service start; schedule them ahead too.
-            if now < meeting_start <= now + timedelta(hours=36):
-                title = meeting['title'] + ' Has Started!'
-                body = 'The service or event has started. Join us now! ' + meeting['note']
-                token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{meeting_start.isoformat()}/started')
-                expires_at = (meeting_start + timedelta(hours=1)).isoformat()
-                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':expires_at}) + '#notifications'
-                send(title, body, token, notice_url, expires_at, meeting_start)
-            for minutes, label in [(1440, 'Tomorrow'), (60, 'Starting in 1 hour'), (30, 'Starting in 30 minutes')]:
+            # Send one reminder every hour during the 24 hours before the gathering.
+            for minutes in range(1440, 0, -60):
+                label = 'Tomorrow' if minutes == 1440 else 'Starting in ' + str(minutes // 60) + ' hour' + ('' if minutes == 60 else 's')
                 reminder_at = meeting_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, meeting_start, minutes):
                     continue

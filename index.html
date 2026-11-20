@@ -204,7 +204,7 @@ const noticeLifetime=24*60*60*1000;
 function noticeKey(m){return String(m.id||m.key||m.title+'|'+m.body)}
 function readMarks(){try{return JSON.parse(localStorage.getItem(readStorageKey)||'{}')}catch{return {}}}
 function markRead(m){const marks=readMarks();marks[noticeKey(m)]=Date.now();try{localStorage.setItem(readStorageKey,JSON.stringify(marks))}catch{}}
-function isFresh(m){const time=new Date(m.sent_at||m.at||0).getTime();const expires=m.expires_at?new Date(m.expires_at).getTime():Infinity;return Number.isFinite(time)&&time>0&&time<=Date.now()&&Date.now()-time<noticeLifetime&&Date.now()<expires}
+function isFresh(m){const time=new Date(m.scheduled_for||m.sent_at||m.at||0).getTime();const expires=m.expires_at?new Date(m.expires_at).getTime():Infinity;return Number.isFinite(time)&&time>0&&time<=Date.now()&&Date.now()-time<noticeLifetime&&Date.now()<expires}
 function readInbox(){try{const items=JSON.parse(localStorage.getItem(inboxStorageKey)||'[]');return Array.isArray(items)?items:[]}catch{return []}}
 let sharedNotices=[];
 const detailElement=document.getElementById('notification-detail');
@@ -219,7 +219,7 @@ function openNotice(m){
  const back=document.createElement('button');back.className='btn';back.textContent='← All Notifications';back.onclick=()=>{detailElement.hidden=true;renderInbox()};
  const heading=document.createElement('h3');heading.textContent=m.title||'Church Notification';
  const body=document.createElement('p');body.textContent=m.body||'';
- const date=document.createElement('small');date.className='muted';const stamp=m.sent_at||m.at;if(stamp)date.textContent=new Date(stamp).toLocaleString();
+ const date=document.createElement('small');date.className='muted';const stamp=m.scheduled_for||m.sent_at||m.at;if(stamp)date.textContent=new Date(stamp).toLocaleString();
  detailElement.append(back,heading,body,date);document.getElementById('notification-inbox').hidden=true;
  detailElement.scrollIntoView({block:'start'});
 }
@@ -230,7 +230,7 @@ function renderInbox(){
   const button=document.createElement('button');button.className='event';button.style.cssText='display:block;width:100%;text-align:left;cursor:pointer;color:inherit;';
   const title=document.createElement('h3');title.textContent=m.title||'Church Notification';
   const body=document.createElement('p');body.textContent=m.body||'';
-  const when=document.createElement('small');when.className='muted';const stamp=m.sent_at||m.at;if(stamp)when.textContent=new Date(stamp).toLocaleString();
+  const when=document.createElement('small');when.className='muted';const stamp=m.scheduled_for||m.sent_at||m.at;if(stamp)when.textContent=new Date(stamp).toLocaleString();
   const status=document.createElement('small');status.textContent=readMarks()[noticeKey(m)]?'✓ Read':'● Unread';status.style.fontWeight='bold';
   button.append(status,title,body,when);button.onclick=()=>openNotice(m);inboxElement.append(button);
  });

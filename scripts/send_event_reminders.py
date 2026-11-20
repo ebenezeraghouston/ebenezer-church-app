@@ -35,7 +35,7 @@ def main():
     original_count = len(history)
     history = [item for item in history if item.get('sent_at') and timedelta(0) <= now - datetime.fromisoformat(item['sent_at']) < timedelta(days=14)]
     history_changed = len(history) != original_count and not args.dry_run
-    def send(title, body, token, url, expires_at=None):
+    def send(title, body, token, url, expires_at=None, scheduled_at=None):
         nonlocal count, history_changed
         count += 1
         print(f'{title}: {body}', flush=True)
@@ -45,7 +45,7 @@ def main():
             print('Already sent; skipping duplicate:', token)
             return
         payload = {'app_id': APP_ID, 'included_segments': ['Total Subscriptions'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token), 'ttl': 3600}
-        req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
+        if scheduled_at and scheduled_at > now:\n            payload['send_after'] = scheduled_at.isoformat()\n        req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
         with urlopen(req, timeout=30) as resp:
             result = json.load(resp)
         if not result.get('id'):
@@ -57,7 +57,7 @@ def main():
             raise RuntimeError('OneSignal notification not accepted: ' + str(errors))
         print('OneSignal accepted notification:', result['id'])
         if not any(item.get('id') == str(token) for item in history):
-            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at})
+            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at, 'scheduled_for':scheduled_at.isoformat() if scheduled_at else None})
             history_changed = True
     if args.send_test:
         if args.dry_run:
@@ -72,7 +72,7 @@ def main():
         print('Push test finished. Check the lines above for OneSignal acceptance or a no-subscribers warning.')
         return
 
-    # Late GitHub runs can still deliver, but never after the event begins.
+    # Queue future reminders with OneSignal before their due time. This avoids reliance on precise GitHub cron execution.\n    def reminder_eligible(reminder_at, event_start, minutes):\n        return reminder_at - timedelta(hours=36) <= now < event_start and (now <= reminder_at or reminder_due(reminder_at, event_start, minutes))\n\n    # Late GitHub runs can still deliver, but never after the event begins.
     def reminder_due(reminder_at, event_start, minutes):
         grace = timedelta(minutes=120 if minutes == 1440 else minutes)
         return reminder_at <= now < min(reminder_at + grace, event_start)
@@ -101,14 +101,14 @@ def main():
             for minutes in event.get('reminder_minutes', [1440, 60, 30]):
                 label = {1440: 'Tomorrow', 60: 'Starting in 1 hour', 30: 'Starting in 30 minutes'}.get(minutes, f'Starting in {minutes} minutes')
                 reminder_at = event_start - timedelta(minutes=minutes)
-                if not reminder_due(reminder_at, event_start, minutes):
+                if not reminder_eligible(reminder_at, event_start, minutes):
                     continue
                 event_id = event.get('id', event['title'] + event['date'])
                 token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/{minutes}min')
                 title = label + ': ' + event['title']
                 body = event_start.strftime('%a, %b %-d at %-I:%M %p') + ' Houston time · ' + event.get('note', 'See details in church app.')
                 notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':event_start.isoformat()}) + '#notifications'
-                send(title, body, token, notice_url, event_start.isoformat())
+                send(title, body, token, notice_url, event_start.isoformat(), reminder_at if reminder_at > now else None)
 
     # Recurring meetings match the times shown on the church app homepage.
     weekly = [
@@ -121,23 +121,27 @@ def main():
         {'id':'spanish-sunday-service','title':'Spanish Service','days':(6,),'hour':14,'minute':0,'time':'2:00 PM','note':'Sunday worship at church.'},
     ]
     for meeting in weekly:
-        for minutes, label in [(1440, 'Tomorrow'), (60, 'Starting in 1 hour'), (30, 'Starting in 30 minutes')]:
-            meeting_start = now.replace(hour=meeting['hour'], minute=meeting['minute'], second=0, microsecond=0)
-            # 24-hour reminders happen on the preceding day.
-            if minutes == 1440:
-                meeting_start += timedelta(days=1)
+        for days_ahead in range(3):
+            meeting_start = (now + timedelta(days=days_ahead)).replace(hour=meeting['hour'], minute=meeting['minute'], second=0, microsecond=0)
             if meeting_start.weekday() not in meeting['days']:
                 continue
-            if minutes == 60:
-                send_started(meeting['title'], meeting_start, meeting['id'], meeting['note'])
-            reminder_at = meeting_start - timedelta(minutes=minutes)
-            if not reminder_due(reminder_at, meeting_start, minutes):
-                continue
-            title = label + ': ' + meeting['title']
-            body = meeting['time'] + ' Houston time · ' + meeting['note']
-            token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{meeting_start.date()}/{minutes}min')
-            notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':meeting_start.isoformat()}) + '#notifications'
-            send(title, body, token, notice_url, meeting_start.isoformat())
+            # Start notifications still require a run at the service start; schedule them ahead too.
+            if now < meeting_start <= now + timedelta(hours=36):
+                title = meeting['title'] + ' Has Started!'
+                body = 'The service or event has started. Join us now! ' + meeting['note']
+                token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{meeting_start.isoformat()}/started')
+                expires_at = (meeting_start + timedelta(hours=1)).isoformat()
+                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':expires_at}) + '#notifications'
+                send(title, body, token, notice_url, expires_at, meeting_start)
+            for minutes, label in [(1440, 'Tomorrow'), (60, 'Starting in 1 hour'), (30, 'Starting in 30 minutes')]:
+                reminder_at = meeting_start - timedelta(minutes=minutes)
+                if not reminder_eligible(reminder_at, meeting_start, minutes):
+                    continue
+                title = label + ': ' + meeting['title']
+                body = meeting['time'] + ' Houston time · ' + meeting['note']
+                token = uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{meeting["id"]}/{meeting_start.date()}/{minutes}min')
+                notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':meeting_start.isoformat()}) + '#notifications'
+                send(title, body, token, notice_url, meeting_start.isoformat(), reminder_at if reminder_at > now else None)
     if history_changed:
         history_path.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'{today}: {count} reminder(s) {"previewed" if args.dry_run else "processed"}.')

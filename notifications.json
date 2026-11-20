@@ -1,5 +1,13 @@
 [
   {
+    "id": "28a9d810-ed95-4a9a-8294-ef7d6da0af5b",
+    "title": "Ebenezer AG — Push Notification Test",
+    "body": "This is a test notification from the Ebenezer AG Church App. No action is needed.",
+    "sent_at": "2026-11-20T09:27:30.970926-06:00",
+    "push_id": "496d558a-60d6-4ef0-87b7-f0bc443dc04a",
+    "expires_at": null
+  },
+  {
     "id": "3fcb4ce4-1369-4309-9401-845b071280dd",
     "title": "Ebenezer AG — Push Notification Test",
     "body": "This is a test notification from the Ebenezer AG Church App. No action is needed.",

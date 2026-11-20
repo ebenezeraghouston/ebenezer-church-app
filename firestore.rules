@@ -41,6 +41,15 @@ service cloud.firestore {
         request.resource.data.notes is string && request.resource.data.notes.size() <= 300;
       allow delete: if admin();
     }
+    match /adminAnnouncements/{announcementId} {
+      allow create: if admin() &&
+        request.resource.data.keys().hasOnly(['title','message','status','createdAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 90 &&
+        request.resource.data.message is string && request.resource.data.message.size() >= 5 && request.resource.data.message.size() <= 500 &&
+        request.resource.data.status == 'pending' && request.resource.data.createdAt == request.time;
+      allow get, list: if admin();
+      allow update, delete: if false;
+    }
     match /prayerRequests/{requestId} {
       allow create: if
         request.resource.data.keys().hasOnly(['message','status','createdAt','expiresAt']) &&

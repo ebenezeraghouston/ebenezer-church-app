@@ -131,6 +131,9 @@ def main():
             meeting_start = (now + timedelta(days=days_ahead)).replace(hour=meeting['hour'], minute=meeting['minute'], second=0, microsecond=0)
             if meeting_start.weekday() not in meeting['days']:
                 continue
+            # Fasting prayer replaces every regular gathering January 3–10, 2027.
+            if date(2027, 1, 3) <= meeting_start.date() <= date(2027, 1, 10):
+                continue
             # Send one reminder every hour during the 24 hours before the gathering.
             for minutes in range(1440, 0, -60):
                 label = 'Tomorrow' if minutes == 1440 else 'Starting in ' + str(minutes // 60) + ' hour' + ('' if minutes == 60 else 's')

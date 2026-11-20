@@ -126,7 +126,7 @@ const weeklyCalendarSchedule={
  4:[["Women’s Zoom Prayer",'2:00 PM','Online via Zoom']],
  5:[['Friday Fasting Prayer','10:00 AM','Online via Zoom']]
 };
-function recurringEventsOnDay(day){if(day>='2027-01-04'&&day<='2027-01-10')return [];const weekday=new Date(day+'T12:00:00').getDay();return (weeklyCalendarSchedule[weekday]||[]).map(([title,time,place])=>({title,time,place}))}
+function recurringEventsOnDay(day){if(day>='2027-01-04'&&day<='2027-01-09')return [];const weekday=new Date(day+'T12:00:00').getDay();return (weeklyCalendarSchedule[weekday]||[]).map(([title,time,place])=>({title,time,place}))}
 function eventsOnCalendarDay(day){return churchEvents.filter(e=>e.date<=day&&(e.end||e.date)>=day).sort((a,b)=>a.date.localeCompare(b.date))}
 function weeklyEventHTML(e){return '<article class="weekly-calendar-event"><span class="weekly-calendar-tag">Regular weekly gathering</span><strong>'+escapeHTML(e.title)+'</strong><span class="weekly-calendar-time">'+escapeHTML(e.time)+'</span><small>'+escapeHTML(e.place)+'</small></article>'}
 function calendarEventDetail(e){return '<details class="calendar-event-detail"><summary><span><strong>'+escapeHTML(e.title)+'</strong><small>'+escapeHTML(e.time||'See details')+'</small></span><span aria-hidden="true">⌄</span></summary><div class="calendar-event-body">'+eventHTML(e)+'</div></details>'}

@@ -132,7 +132,7 @@ def main():
             if meeting_start.weekday() not in meeting['days']:
                 continue
             # Fasting prayer replaces every regular gathering January 3–10, 2027.
-            if date(2027, 1, 4) <= meeting_start.date() <= date(2027, 1, 10):
+            if date(2027, 1, 4) <= meeting_start.date() <= date(2027, 1, 9):
                 continue
             # Send one reminder every hour during the 24 hours before the gathering.
             for minutes in range(1440, 0, -60):

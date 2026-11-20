@@ -26,6 +26,9 @@ header .inner>div:nth-child(2){min-width:0;flex:1}
 header h1{white-space:nowrap;letter-spacing:-.35px}
 header .header-menu{flex-shrink:0}
 @media(max-width:600px){header .inner{padding:13px 10px;gap:7px}header img{width:48px;height:48px;padding:3px;flex-shrink:0}header h1{font-size:clamp(10px,3vw,15px);letter-spacing:-.5px}header p{font-size:clamp(10px,2.7vw,12px)}header .menu-toggle{padding:6px 8px;font-size:19px}}
+
+/* Accessible month-view church events calendar */
+.calendar-weekdays,.home-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.calendar-weekdays{margin:15px 0 7px}.calendar-weekdays span{text-align:center;font-size:11px;font-weight:700;color:#536a87}.home-calendar{margin-bottom:20px}.calendar-empty{min-height:62px}.calendar-day{min-width:0;min-height:62px;border:1px solid #dce5f0;border-radius:12px;background:#f8fafc;color:#1b3557;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font:600 14px 'Poppins',system-ui,sans-serif;transition:background .16s,transform .16s,border-color .16s}.calendar-day:hover{transform:translateY(-2px);background:#eff4fb}.calendar-day.has-event{background:#eaf0fa;border-color:#b4c6df;font-weight:800}.calendar-day.selected{background:#173b65;color:#fff;border-color:#173b65;box-shadow:0 5px 12px #0b193027}.calendar-day.is-today .calendar-date-number{text-decoration:underline;text-decoration-color:#d8a93b;text-decoration-thickness:3px;text-underline-offset:4px}.calendar-event-dot{height:7px;width:7px;background:#c69329;border-radius:50%;box-shadow:0 0 0 2px #e9bd5830}.calendar-day.selected .calendar-event-dot{background:#f5ce74}.calendar-day:focus-visible{outline:3px solid #e9bd58;outline-offset:2px}.calendar-selection-title{margin:12px 0;color:#173b65}@media(max-width:430px){.calendar-weekdays,.home-calendar{gap:4px}.calendar-weekdays span{font-size:10px}.calendar-day{min-height:49px;border-radius:9px;font-size:12px}.calendar-empty{min-height:49px}}@media(prefers-reduced-motion:reduce){.calendar-day{transition:none}.calendar-day:hover{transform:none}}
 </style>
 <!-- Google Analytics: tracks public page visits; does not measure exact home-screen installs. -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NY7D4R99S1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-NY7D4R99S1',{send_page_view:true});</script>
@@ -47,7 +50,7 @@ header .header-menu{flex-shrink:0}
 <div class="panel"><h2>📖 Sunday School</h2><div class="schedule"><span>Malayalam Sunday School</span><span class="time">9:15 AM</span></div><div class="schedule"><span>English Sunday School<br><small class="muted">Elementary, Middle School, High School, College and Adults</small></span><span class="time">11:00 AM</span></div></div>
 <div class="panel"><h2>⛪ Sunday Services</h2><div class="schedule"><span>English Worship Service</span><span class="time">10:00 AM</span></div><div class="schedule"><span>Malayalam Worship Service</span><span class="time">11:00 AM</span></div><div class="schedule"><span>Spanish Service</span><span class="time">2:00 PM</span></div></div>
 <div class="panel"><h2>🙏 Weekly Prayer</h2><div class="schedule"><span>Women's Zoom Prayer<br><small class="muted">Monday–Thursday</small></span><span class="time">2:00 PM</span></div><div class="schedule"><span>Friday Fasting Prayer (Zoom)</span><span class="time">10:00 AM</span></div></div>
-<div class="panel"><h2>📅 Monthly Church Events</h2><p class="muted">Browse each month to see upcoming church events and their details.</p><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0"><button type="button" class="btn" id="month-prev" aria-label="Previous month">‹</button><strong id="month-heading" aria-live="polite"></strong><button type="button" class="btn" id="month-next" aria-label="Next month">›</button></div><div id="home-events"><p class="status">Loading monthly events…</p></div><button class="btn" data-tab="events">View all events</button></div></section>
+<div class="panel"><h2>📅 Monthly Church Events</h2><p class="muted">Browse each month to see upcoming church events and their details.</p><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0"><button type="button" class="btn" id="month-prev" aria-label="Previous month">‹</button><strong id="month-heading" aria-live="polite"></strong><button type="button" class="btn" id="month-next" aria-label="Next month">›</button></div><div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div id="home-calendar" class="home-calendar" aria-label="Monthly church events calendar"></div><div id="home-events" aria-live="polite"><p class="status">Loading monthly events…</p></div><button class="btn" data-tab="events">View all events</button></div></section>
 <section class="page" id="events"><button type="button" class="section-back" data-tab="home" aria-label="Back to Home">← Back to Home</button><div class="panel"><h2>📅 Church Events</h2><p class="muted">Schedules may change. Please check church announcements for updates.</p><div id="event-list"><p class="status">Loading events…</p></div></div></section>
 <section class="page" id="ministries"><button type="button" class="section-back" data-tab="home" aria-label="Back to Home">← Back to Home</button><div class="panel" style="background:#0e2341;color:white"><span class="eyebrow">Connect • Serve • Grow</span><h2 style="font-size:27px;margin:9px 0 17px">Church Ministries</h2><div class="cards" id="ministry-cards"></div><div id="ministry-details" class="team-details" style="color:#13233b" aria-live="polite"></div><p style="margin:22px 0 0"><a class="gold" href="mailto:ebaghouston@gmail.com?subject=I%20Would%20Like%20to%20Serve%20-%20Ebenezer%20AG">🤝 If You'd Like to Serve, Please Let Us Know →</a></p></div><div class="panel"><h2>Other Coordinators</h2><div id="other-leaders"></div></div></section>
 <section class="page" id="giving"><button type="button" class="section-back" data-tab="home" aria-label="Back to Home">← Back to Home</button><div class="panel"><h2>❤️ Giving</h2><p>Thank you for supporting the ministry of Ebenezer Assembly of God.</p><h3>Zelle</h3><p>Use the church's previously provided Zelle number:</p><p><strong id="zelle-number">417-274-1156</strong></p><button class="btn" id="copy-zelle">Copy Zelle number</button><h3>Venmo</h3><p><strong>@Ebenezer-AG</strong></p><a class="btn venmo-direct" href="https://venmo.com/u/Ebenezer-AG" target="_blank" rel="noopener noreferrer">Open Venmo</a><p class="status">Confirm the recipient's identity with the church before sending a payment. Payments are processed outside this app.</p></div></section>
@@ -108,14 +111,34 @@ function downloadEventCalendar(e){
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calendar-id]');if(!b)return;const event=churchEvents.find(x=>(x.id||x.date+'-'+x.title)===b.dataset.calendarId);if(event)downloadEventCalendar(event)});
 let visibleMonth=new Date();visibleMonth=new Date(visibleMonth.getFullYear(),visibleMonth.getMonth(),1);
+let selectedCalendarDate=null;
+function eventsOnCalendarDay(day){return churchEvents.filter(e=>e.date<=day&&(e.end||e.date)>=day).sort((a,b)=>a.date.localeCompare(b.date))}
+function showCalendarDay(day){
+ selectedCalendarDate=day;
+ const items=eventsOnCalendarDay(day);
+ const heading=new Date(day+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+ document.getElementById('home-events').innerHTML='<h3 class="calendar-selection-title">'+escapeHTML(heading)+'</h3>'+(items.map(eventHTML).join('')||'<p class="status">No church events scheduled for this date.</p>');
+ document.querySelectorAll('#home-calendar button[data-calendar-day]').forEach(b=>{const active=b.dataset.calendarDay===day;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active))});
+}
 function renderHomeMonth(){
  const year=visibleMonth.getFullYear(),month=visibleMonth.getMonth();
  document.getElementById('month-heading').textContent=visibleMonth.toLocaleDateString('en-US',{month:'long',year:'numeric'});
- const first=year+'-'+String(month+1).padStart(2,'0')+'-01';
- const monthEnd=year+'-'+String(month+1).padStart(2,'0')+'-'+String(new Date(year,month+1,0).getDate()).padStart(2,'0');
- const events=churchEvents.filter(e=>e.date<=monthEnd&&(e.end||e.date)>=first).sort((a,b)=>a.date.localeCompare(b.date));
- document.getElementById('home-events').innerHTML=events.map(eventHTML).join('')||'<p class="status">No church events scheduled for this month yet.</p>';
+ const firstDay=new Date(year,month,1).getDay(),days=new Date(year,month+1,0).getDate();
+ const monthStr=year+'-'+String(month+1).padStart(2,'0');
+ const today=new Date(),todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+ const cells=Array.from({length:firstDay},()=>'<span class="calendar-empty" aria-hidden="true"></span>');
+ const eventDays=[];
+ for(let i=1;i<=days;i++){
+  const day=monthStr+'-'+String(i).padStart(2,'0'),items=eventsOnCalendarDay(day),hasEvents=items.length>0;
+  if(hasEvents)eventDays.push(day);
+  const label=day+(hasEvents?', '+items.length+' church event'+(items.length===1?'':'s')+': '+items.map(e=>e.title).join(', '):', no scheduled church events');
+  cells.push('<button type="button" class="calendar-day'+(hasEvents?' has-event':'')+(day===todayStr?' is-today':'')+'" data-calendar-day="'+day+'" aria-label="'+escapeHTML(label)+'" aria-pressed="false"><span class="calendar-date-number">'+i+'</span>'+(hasEvents?'<span class="calendar-event-dot" aria-hidden="true"></span>':'')+'</button>');
+ }
+ document.getElementById('home-calendar').innerHTML=cells.join('');
+ const preferred=selectedCalendarDate?.startsWith(monthStr)?selectedCalendarDate:(eventDays.find(day=>day>=todayStr)||eventDays[0]||monthStr+'-01');
+ showCalendarDay(preferred);
 }
+document.getElementById('home-calendar').addEventListener('click',e=>{const button=e.target.closest('button[data-calendar-day]');if(button)showCalendarDay(button.dataset.calendarDay)});
 document.getElementById('month-prev').addEventListener('click',()=>{visibleMonth=new Date(visibleMonth.getFullYear(),visibleMonth.getMonth()-1,1);renderHomeMonth()});
 document.getElementById('month-next').addEventListener('click',()=>{visibleMonth=new Date(visibleMonth.getFullYear(),visibleMonth.getMonth()+1,1);renderHomeMonth()});
 async function loadChurchEvents(){

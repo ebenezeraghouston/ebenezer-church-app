@@ -72,7 +72,11 @@ def main():
         print('Push test finished. Check the lines above for OneSignal acceptance or a no-subscribers warning.')
         return
 
-    # Queue future reminders with OneSignal before their due time. This avoids reliance on precise GitHub cron execution.\n    def reminder_eligible(reminder_at, event_start, minutes):\n        return reminder_at - timedelta(hours=36) <= now < event_start and (now <= reminder_at or reminder_due(reminder_at, event_start, minutes))\n\n    # Late GitHub runs can still deliver, but never after the event begins.
+    # Queue future reminders with OneSignal before their due time. This avoids reliance on precise GitHub cron execution.
+    def reminder_eligible(reminder_at, event_start, minutes):
+        return reminder_at - timedelta(hours=36) <= now < event_start and (now <= reminder_at or reminder_due(reminder_at, event_start, minutes))
+
+    # Late GitHub runs can still deliver, but never after the event begins.
     def reminder_due(reminder_at, event_start, minutes):
         grace = timedelta(minutes=120 if minutes == 1440 else minutes)
         return reminder_at <= now < min(reminder_at + grace, event_start)

@@ -85,6 +85,29 @@ def main():
             except Exception as error:
                 print('WARNING: Unable to cancel queued Youth Meeting push:', push_id, error, flush=True)
 
+    # Cancel any previously queued individual Sunday service pushes, including
+    # hourly alerts. The consolidated Sunday reminders replace them.
+    sunday_titles = ('Malayalam Sunday School', 'English Worship Service', 'English Sunday School',
+                     'Malayalam Worship Service', 'Spanish Service')
+    if not args.dry_run:
+        for item in list(history):
+            if not any(name in item.get('title', '') for name in sunday_titles):
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now:
+                continue
+            push_id = item.get('push_id')
+            if not push_id:
+                continue
+            url = 'https://api.onesignal.com/notifications/' + push_id + '?' + urlencode({'app_id': APP_ID})
+            try:
+                with urlopen(Request(url, headers={'Authorization': 'Key ' + key}, method='DELETE'), timeout=30) as response:
+                    print('Cancelled individual Sunday push:', push_id, response.status)
+                history.remove(item)
+                history_changed = True
+            except Exception as error:
+                print('WARNING: Unable to cancel individual Sunday push:', push_id, error, flush=True)
+
     if args.send_test:
         if args.dry_run:
             parser.error('--send-test cannot be combined with --dry-run')
@@ -149,7 +172,35 @@ def main():
         {'id':'malayalam-sunday-worship','title':'Malayalam Worship Service','days':(6,),'hour':11,'minute':0,'time':'11:00 AM','note':'Sunday worship at church.'},
         {'id':'spanish-sunday-service','title':'Spanish Service','days':(6,),'hour':14,'minute':0,'time':'2:00 PM','note':'Sunday worship at church.'},
     ]
+    # One consolidated Saturday evening notification and one Sunday morning notification.
+    # All service times are Houston local time.
+    for days_ahead in range(3):
+        sunday = (now + timedelta(days=days_ahead)).date()
+        if sunday.weekday() != 6:
+            continue
+        if sunday == date(2027, 1, 3):
+            continue
+        sunday_start = datetime.combine(sunday, time(9, 15), ZoneInfo('America/Chicago'))
+        expires_at = datetime.combine(sunday, time(14, 0), ZoneInfo('America/Chicago')).isoformat()
+        body = ('Malayalam Sunday School 9:15 AM; English Worship 10:00 AM; '
+                'English Sunday School 11:00 AM; Malayalam Worship 11:00 AM; '
+                'Spanish Service 2:00 PM. All times Houston local.')
+        for label, reminder_at in (
+            ('Tomorrow', sunday_start - timedelta(days=1) + timedelta(hours=8, minutes=45)),
+            ('Today', datetime.combine(sunday, time(8, 0), ZoneInfo('America/Chicago')))
+        ):
+            if not (reminder_at - timedelta(hours=36) <= now < sunday_start):
+                continue
+            if now > reminder_at + timedelta(minutes=30):
+                continue
+            title = label + ': Ebenezer AG Sunday Services'
+            token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/combined-sunday/{sunday}/{label}')
+            notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':expires_at}) + '#notifications'
+            send(title, body, token, notice_url, expires_at, reminder_at if reminder_at > now else None)
+
     for meeting in weekly:
+        if meeting['days'] == (6,):
+            continue  # Sunday services are covered by the combined reminders.
         for days_ahead in range(3):
             meeting_start = (now + timedelta(days=days_ahead)).replace(hour=meeting['hour'], minute=meeting['minute'], second=0, microsecond=0)
             if meeting_start.weekday() not in meeting['days']:

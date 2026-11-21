@@ -61,6 +61,30 @@ def main():
         if not any(item.get('id') == str(token) for item in history):
             history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at, 'scheduled_for':scheduled_at.isoformat() if scheduled_at else None})
             history_changed = True
+    # One-time cleanup: cancel previously queued hourly Youth Meeting alerts.
+    # Keep only a single Saturday morning reminder at 10:00 AM Houston time.
+    youth_date = date(2026, 11, 21)
+    youth_start = datetime(2026, 11, 21, 19, 0, tzinfo=ZoneInfo('America/Chicago'))
+    if not args.dry_run and now < youth_start:
+        for item in list(history):
+            if 'Youth Meeting' not in item.get('title', ''):
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now:
+                continue
+            push_id = item.get('push_id')
+            if not push_id:
+                continue
+            cancel_url = 'https://api.onesignal.com/notifications/' + push_id + '?' + urlencode({'app_id': APP_ID})
+            request = Request(cancel_url, headers={'Authorization': 'Key ' + key}, method='DELETE')
+            try:
+                with urlopen(request, timeout=30) as response:
+                    print('Cancelled queued Youth Meeting push:', push_id, response.status)
+                history.remove(item)
+                history_changed = True
+            except Exception as error:
+                print('WARNING: Unable to cancel queued Youth Meeting push:', push_id, error, flush=True)
+
     if args.send_test:
         if args.dry_run:
             parser.error('--send-test cannot be combined with --dry-run')
@@ -91,6 +115,17 @@ def main():
         start_times = event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else [])
         for start_text in start_times:
             event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
+            # Youth Meeting exception: one Saturday morning reminder, no hourly/day-of countdowns.
+            if event.get('id') == 'youth-meeting-2026-11-21':
+                reminder_at = event_start.replace(hour=10, minute=0)
+                if reminder_at - timedelta(hours=36) <= now < event_start:
+                    token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/youth-meeting-2026-11-21/saturday-10am-only')
+                    title = 'Today: Youth Meeting at 7 PM'
+                    body = 'Saturday, November 21 at 7:00 PM Houston time · At church · Contact Albin for programs.'
+                    notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':event_start.isoformat()}) + '#notifications'
+                    if now <= reminder_at:
+                        send(title, body, token, notice_url, event_start.isoformat(), reminder_at)
+                continue
             # Do not send a notification at or after the start time.
             for minutes in (1440, 60, 30):
                 label = 'Tomorrow' if minutes == 1440 else ('Starting in 1 hour' if minutes == 60 else 'Starting in 30 minutes')

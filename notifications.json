@@ -1,5 +1,14 @@
 [
   {
+    "id": "140d65a9-38c8-5e78-8220-c8b18df24939",
+    "title": "Today: Youth Meeting at 7 PM",
+    "body": "Saturday, November 21 at 7:00 PM Houston time · At church · Contact Albin for programs.",
+    "sent_at": "2026-11-21T05:56:44.416842-06:00",
+    "push_id": "ecf8f1bb-9550-4821-b094-79ec16e903fc",
+    "expires_at": "2026-11-21T19:00:00-06:00",
+    "scheduled_for": "2026-11-21T10:00:00-06:00"
+  },
+  {
     "id": "9fb5fd7a-900f-3985-b76c-dbc9413431bc",
     "title": "Starting in 21 hours: Women's Zoom Prayer",
     "body": "2:00 PM Houston time · Join the weekly Zoom prayer meeting.",
@@ -7,15 +16,6 @@
     "push_id": "644ffa37-8b8f-4aa6-a34f-1f6db2eacd5b",
     "expires_at": "2026-11-23T14:00:00-06:00",
     "scheduled_for": "2026-11-22T17:00:00-06:00"
-  },
-  {
-    "id": "140d65a9-38c8-5e78-8220-c8b18df24939",
-    "title": "Today: Youth Meeting at 7 PM",
-    "body": "Saturday, November 21 at 7:00 PM Houston time · At church · Contact Albin for programs.",
-    "sent_at": "2026-11-21T05:09:54.305286-06:00",
-    "push_id": "ecf8f1bb-9550-4821-b094-79ec16e903fc",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T10:00:00-06:00"
   },
   {
     "id": "839a40b3-d9f7-396c-95ca-27517ea5de96",

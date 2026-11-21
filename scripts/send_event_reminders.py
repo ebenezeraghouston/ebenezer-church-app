@@ -83,18 +83,6 @@ def main():
         grace = timedelta(minutes=120 if minutes == 1440 else minutes)
         return reminder_at <= now < min(reminder_at + grace, event_start)
 
-    # Reminders stop strictly before the event starts; no new 'has started' alerts.\n    # Start alerts are eligible only during the first ten minutes of a service.
-    # A separate idempotency key prevents duplicate start alerts across workflow runs.
-    def send_started(name, event_start, event_id, note):
-        if not (event_start <= now < event_start + timedelta(minutes=10)):
-            return
-        title = name + ' Has Started!'
-        body = 'The service or event has started. Join us now! ' + note
-        token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/{event_id}/{event_start.isoformat()}/started')
-        expires_at = (event_start + timedelta(hours=1)).isoformat()
-        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':expires_at}) + '#notifications'
-        send(title, body, token, notice_url, expires_at)
-
     # Exact-time events: previous day (24h), 1h, and 30min before.
     # No precise reminder is sent when the event has no confirmed start_local.
     for event in events:
@@ -104,8 +92,8 @@ def main():
         for start_text in start_times:
             event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
             # Do not send a notification at or after the start time.
-            for minutes in range(1440, 0, -60):
-                label = 'Tomorrow' if minutes == 1440 else f'Starting in {minutes // 60} hour' + ('' if minutes == 60 else 's')
+            for minutes in (1440, 60, 30):
+                label = 'Tomorrow' if minutes == 1440 else ('Starting in 1 hour' if minutes == 60 else 'Starting in 30 minutes')
                 reminder_at = event_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, event_start, minutes):
                     continue
@@ -134,9 +122,9 @@ def main():
             # Fasting prayer replaces every regular gathering January 3–10, 2027.
             if date(2027, 1, 4) <= meeting_start.date() <= date(2027, 1, 9):
                 continue
-            # Send one reminder every hour during the 24 hours before the gathering.
-            for minutes in range(1440, 0, -60):
-                label = 'Tomorrow' if minutes == 1440 else 'Starting in ' + str(minutes // 60) + ' hour' + ('' if minutes == 60 else 's')
+            # Only three reminders: 24 hours, 1 hour, and 30 minutes before the gathering.
+            for minutes in (1440, 60, 30):
+                label = 'Tomorrow' if minutes == 1440 else ('Starting in 1 hour' if minutes == 60 else 'Starting in 30 minutes')
                 reminder_at = meeting_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, meeting_start, minutes):
                     continue

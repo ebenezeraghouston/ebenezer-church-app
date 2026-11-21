@@ -122,9 +122,9 @@ def main():
             # Fasting prayer replaces every regular gathering January 3–10, 2027.
             if date(2027, 1, 4) <= meeting_start.date() <= date(2027, 1, 9):
                 continue
-            # Only three reminders: 24 hours, 1 hour, and 30 minutes before the gathering.
-            for minutes in (1440, 60, 30):
-                label = 'Tomorrow' if minutes == 1440 else ('Starting in 1 hour' if minutes == 60 else 'Starting in 30 minutes')
+            # Preserve the existing hourly reminder schedule for recurring weekly gatherings.
+            for minutes in range(1440, 0, -60):
+                label = 'Tomorrow' if minutes == 1440 else 'Starting in ' + str(minutes // 60) + ' hour' + ('' if minutes == 60 else 's')
                 reminder_at = meeting_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, meeting_start, minutes):
                     continue

@@ -1,5 +1,23 @@
 [
   {
+    "id": "3d20910b-efea-35fc-8bba-2ef16d9478a9",
+    "title": "Starting in 3 hours: Spanish Service",
+    "body": "2:00 PM Houston time · Sunday worship at church.",
+    "sent_at": "2026-11-20T23:17:24.069855-06:00",
+    "push_id": "6d6032a6-dea9-4f0f-9764-c834e47b4de4",
+    "expires_at": "2026-11-22T14:00:00-06:00",
+    "scheduled_for": "2026-11-22T11:00:00-06:00"
+  },
+  {
+    "id": "140d65a9-38c8-5e78-8220-c8b18df24939",
+    "title": "Today: Youth Meeting at 7 PM",
+    "body": "Saturday, November 21 at 7:00 PM Houston time · At church · Contact Albin for programs.",
+    "sent_at": "2026-11-20T23:17:24.069855-06:00",
+    "push_id": "ecf8f1bb-9550-4821-b094-79ec16e903fc",
+    "expires_at": "2026-11-21T19:00:00-06:00",
+    "scheduled_for": "2026-11-21T10:00:00-06:00"
+  },
+  {
     "id": "e86939f9-08f8-30ac-a1d7-c803b83cfb4c",
     "title": "Starting in 4 hours: Spanish Service",
     "body": "2:00 PM Houston time · Sunday worship at church.",
@@ -1008,168 +1026,6 @@
     "scheduled_for": "2026-11-21T10:15:00-06:00"
   },
   {
-    "id": "efe8a73a-6209-3dff-992e-d949c45fce9e",
-    "title": "Starting in 2 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "1aefba49-038c-40c6-990e-f3a68797c9e6",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T17:00:00-06:00"
-  },
-  {
-    "id": "eb08389c-8252-36ae-b23a-fb44709fc5c2",
-    "title": "Starting in 3 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "20e369c7-1ab6-4e25-9cb9-3a3649d86784",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T16:00:00-06:00"
-  },
-  {
-    "id": "66077a76-9a52-383b-924a-7f1264c390e2",
-    "title": "Starting in 4 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "fbada71b-60ec-4deb-a661-9d7628be61ce",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T15:00:00-06:00"
-  },
-  {
-    "id": "ff695d0e-c1cd-367e-ba77-c4d17b266603",
-    "title": "Starting in 5 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "bb9ff1e0-26c3-487c-bfe9-219df0886fde",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T14:00:00-06:00"
-  },
-  {
-    "id": "7fdff9df-f285-3c82-a6e2-efb02e3f38be",
-    "title": "Starting in 6 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "005e5384-45b1-4788-bc39-d861aa6375b6",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T13:00:00-06:00"
-  },
-  {
-    "id": "b3bfd1fa-1b78-3529-866f-5a20c3269fb0",
-    "title": "Starting in 7 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "8ecd4609-28f7-4c89-a99b-ab7dd84b76df",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T12:00:00-06:00"
-  },
-  {
-    "id": "0b4cf633-505d-380b-8997-27f2b81f4e5b",
-    "title": "Starting in 8 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "deea0f18-5f59-4403-be55-3d5be9de9c18",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T11:00:00-06:00"
-  },
-  {
-    "id": "43180f2a-9c48-30eb-b4e8-368ccf824c75",
-    "title": "Starting in 9 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "adda1fe9-b117-4ee8-a2c5-bdf63ad667d7",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T10:00:00-06:00"
-  },
-  {
-    "id": "07d8eb82-73e3-3489-8e75-9f33a80491d5",
-    "title": "Starting in 10 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "d46ffaa0-9c17-46a5-a7b9-e92da40e1931",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T09:00:00-06:00"
-  },
-  {
-    "id": "00794763-3ed2-3d15-86ea-504eb5f24be5",
-    "title": "Starting in 11 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "5f8245cb-2d98-4804-aa88-7935015300b7",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T08:00:00-06:00"
-  },
-  {
-    "id": "1f7498fe-1038-3d50-b14a-952ca637d33d",
-    "title": "Starting in 12 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "f1859749-df61-4d6c-95c6-cbd85464294b",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T07:00:00-06:00"
-  },
-  {
-    "id": "c764db25-2baa-37d7-907e-181f47599ee3",
-    "title": "Starting in 13 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "53a3fa52-54b3-487b-8b53-f5603f47fbe4",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T06:00:00-06:00"
-  },
-  {
-    "id": "92d360ad-810e-3f2d-b02e-80af579297f7",
-    "title": "Starting in 14 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "531884ba-73e9-45ff-93e5-18a3823b9eab",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T05:00:00-06:00"
-  },
-  {
-    "id": "909aeec7-8aec-335e-80f2-5978314228a7",
-    "title": "Starting in 15 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "4c2ddaca-4e32-4aac-aff4-bf459fabca5c",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T04:00:00-06:00"
-  },
-  {
-    "id": "4bce274f-2521-3165-86b7-4439f5a0ec2a",
-    "title": "Starting in 16 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "8e491b6f-522a-4e77-814d-c5aa0c65ac0e",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T03:00:00-06:00"
-  },
-  {
-    "id": "8aabff11-5959-365d-8585-694877291f7e",
-    "title": "Starting in 17 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "6e295f19-f240-4575-85e0-38abf30cdf21",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T02:00:00-06:00"
-  },
-  {
-    "id": "f9f3722f-c22d-3293-be50-fd500fbc8771",
-    "title": "Starting in 18 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "ad5dc357-7ff1-46f4-a914-8fd767da4d5d",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T01:00:00-06:00"
-  },
-  {
-    "id": "ebfb97bd-3d0f-38c7-9cd3-24f2bf7b5fa7",
-    "title": "Starting in 19 hours: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T10:39:33.315163-06:00",
-    "push_id": "9b512b57-3610-40c0-91c8-c0ba98177bae",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T00:00:00-06:00"
-  },
-  {
     "id": "7923fbde-9130-37d0-82ff-b69132265bc3",
     "title": "Starting in 20 hours: Youth Meeting",
     "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
@@ -1276,24 +1132,6 @@
     "push_id": "354bcb7b-874d-4457-8231-792e24240424",
     "expires_at": "2026-11-20T11:00:00-06:00",
     "scheduled_for": "2026-11-20T10:00:00-06:00"
-  },
-  {
-    "id": "a81ce762-0fd2-3f8b-bf59-3f747a1f7ab4",
-    "title": "Starting in 30 minutes: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T09:37:34.235645-06:00",
-    "push_id": "a35954f2-71fd-4957-9f6a-756f36a64b7c",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T18:30:00-06:00"
-  },
-  {
-    "id": "da2edd50-4a9d-3f19-b2ec-2a22634992d4",
-    "title": "Starting in 1 hour: Youth Meeting",
-    "body": "Sat, Nov 21 at 7:00 PM Houston time · At church · Contact Albin for programs",
-    "sent_at": "2026-11-20T09:37:34.235645-06:00",
-    "push_id": "3800d056-37c9-45ea-9b00-c9286dc2a77b",
-    "expires_at": "2026-11-21T19:00:00-06:00",
-    "scheduled_for": "2026-11-21T18:00:00-06:00"
   },
   {
     "id": "504d36cb-1e40-3822-85c9-e438dad659ce",

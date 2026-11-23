@@ -112,7 +112,19 @@ def main():
     # New reminders are limited to one push at 1:00 PM Houston time each meeting day.
     if not args.dry_run:
         for item in list(history):
-            if "Women's Zoom Prayer" not in item.get('title', '') or item.get('title', '').startswith("Today: Women's Zoom Prayer at 2:00 PM"):
+            if "Women's Zoom Prayer" not in item.get('title', ''):
+                continue
+            # Preserve only the new once-daily 1 PM notification for its meeting date.
+            # Older 'Today' notifications may also be queued hourly and must be cancelled.
+            scheduled_date = None
+            try:
+                scheduled_date = datetime.fromisoformat(item.get('scheduled_for') or '').astimezone(ZoneInfo('America/Chicago')).date()
+            except (ValueError, TypeError):
+                pass
+            expected_token = (str(uuid.uuid5(uuid.NAMESPACE_URL,
+                f'{APP_ID}/womens-zoom-prayer/{scheduled_date}/1pm-only'))
+                if scheduled_date else None)
+            if item.get('id') == expected_token:
                 continue
             scheduled = item.get('scheduled_for')
             if not scheduled or datetime.fromisoformat(scheduled) <= now:

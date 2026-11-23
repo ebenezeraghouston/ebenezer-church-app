@@ -15,10 +15,10 @@ async function refresh(){
   history.replaceChildren();
   const heading=document.createElement('h3');heading.textContent='Recent announcements';history.append(heading);
   if(snap.empty){const p=document.createElement('p');p.textContent='No announcements sent yet.';history.append(p);}
-  for(const item of snap.docs){const d=item.data(),row=document.createElement('article');row.className='event';const name=document.createElement('strong');name.textContent=d.title;const p=document.createElement('p');p.textContent=d.message;const meta=document.createElement('small');meta.textContent='Status: '+(d.status==='sent'?'Sent to OneSignal':d.status==='pending'?'Queued for delivery':d.status||'Unknown');row.append(name,p,meta);history.append(row)}
+  for(const item of snap.docs){const d=item.data(),row=document.createElement('article');row.className='event';const name=document.createElement('strong');name.textContent=d.title;const p=document.createElement('p');p.textContent=d.message;const meta=document.createElement('small');meta.textContent='Status: '+(d.status==='sent'?'Accepted by OneSignal'+(typeof d.recipients==='number'?' ('+d.recipients+' targeted)':''):d.status==='sending'?'Sending to OneSignal…':d.status==='pending'?'Queued for delivery':d.status==='failed'?'Delivery failed — '+(d.errorMessage||'check function logs'):d.status||'Unknown');row.append(name,p,meta);history.append(row)}
  }catch(e){history.textContent='Unable to load announcement history: '+e.message}
 }
-onAuthStateChanged(auth,u=>{isAdmin=Boolean(u&&u.uid===ADMIN_UID&&!u.isAnonymous&&u.providerData.some(p=>p.providerId==='google.com'));panel.hidden=!isAdmin;if(isAdmin)refresh()});
+onAuthStateChanged(auth,u=>{isAdmin=Boolean(u&&u.uid===ADMIN_UID&&!u.isAnonymous&&u.providerData.some(p=>p.providerId==='google.com'));panel.hidden=!isAdmin;if(isAdmin){refresh();setInterval(()=>{if(isAdmin&&!document.hidden)refresh()},15000)}});
 document.getElementById('announcement-preview').addEventListener('click',()=>{status.textContent='Preview — '+(title.value.trim()||'(title)')+': '+(message.value.trim()||'(message)')});
 form.addEventListener('submit',async e=>{
  e.preventDefault();
@@ -27,7 +27,7 @@ form.addEventListener('submit',async e=>{
  if(t.length<3||t.length>90||m.length<5||m.length>500){status.textContent='Title must be 3–90 characters; message 5–500.';return}
  if(!confirm('Send this notification to ALL subscribed church devices?\n\n'+t+'\n'+m))return;
  send.disabled=true;status.textContent='Queuing notification securely…';
- try{await addDoc(collection(db,'adminAnnouncements'),{title:t,message:m,status:'pending',createdAt:serverTimestamp()});status.textContent='Notification queued. Delivery is normally processed within several minutes; check status below.';form.reset();await refresh()}
+ try{await addDoc(collection(db,'adminAnnouncements'),{title:t,message:m,status:'pending',createdAt:serverTimestamp()});status.textContent='Notification queued for immediate processing. Check Recent Announcements for confirmation.';form.reset();await refresh()}
  catch(err){status.textContent='Could not queue notification: '+err.message+' Check that the updated Firestore security rules are published.'}
  finally{send.disabled=false}
 });

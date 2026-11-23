@@ -1,31 +1,32 @@
-# Deploy immediate admin push notifications
+# Free GitHub Actions notification sender — setup
 
-The GitHub Pages website cannot securely call OneSignal using its REST API key. The Firebase Cloud Function in `functions/index.js` sends each new `adminAnnouncements` document to OneSignal when created.
+The app saves admin announcements to Firebase Firestore. The GitHub Actions workflow `.github/workflows/admin-push-notifications.yml` checks for pending messages approximately every 5 minutes and submits them to OneSignal. GitHub scheduled workflows can be delayed. The app status changes to **Accepted by OneSignal** when accepted; this does not guarantee device receipt.
 
-## Prerequisites
-- Firebase project: `ebenezer-ag-church-app`
-- Permission to deploy Cloud Functions, access Firestore, and manage secrets
-- Firebase **Blaze (pay-as-you-go)** plan (Cloud Functions requires billing; usage charges may apply)
-- OneSignal REST API key for the existing church app (never commit the key)
+## Step 1 — OneSignal REST API key
+1. Sign in to OneSignal, open the existing Ebenezer AG app.
+2. Find the app's REST API key in Settings → Keys & IDs (exact menu labels may differ).
+3. In GitHub, open `ebenezeraghouston/ebenezer-church-app` → Settings → Secrets and variables → Actions → New repository secret.
+4. Name: `ONESIGNAL_REST_API_KEY`. Paste the REST API key. Never paste it into a GitHub file or chat.
 
-## Deploy from a computer
-1. Install Node.js 22 and Firebase CLI: `npm install -g firebase-tools`.
-2. Clone or download this GitHub repository, then open a terminal in its root.
-3. Run `firebase login`.
-4. Run `firebase use ebenezer-ag-church-app`.
-5. Run `npm --prefix functions install`.
-6. Run `firebase functions:secrets:set ONESIGNAL_REST_API_KEY` and paste your OneSignal **REST API key** when prompted.
-7. Deploy the function: `firebase deploy --only functions:sendAdminAnnouncement`.
-8. Publish the repaired Firestore security rules separately: `firebase deploy --only firestore:rules`. Review existing Firebase rules first if they have been edited outside GitHub.
+## Step 2 — Firebase service account
+1. Firebase Console → project `ebenezer-ag-church-app` → Project settings → Service accounts.
+2. Generate a **new private key** for a dedicated service account, or preferably create a dedicated service account in Google Cloud IAM with only **Cloud Datastore User** access to this Firestore database, then generate its JSON key. Treat the JSON as a highly sensitive credential.
+3. In GitHub → Settings → Secrets and variables → Actions → New repository secret.
+4. Name: `FIREBASE_SERVICE_ACCOUNT_JSON`. Paste the entire JSON key content.
+5. Do not upload this key to the repository or share it publicly. Rotate/revoke it if exposed.
 
-## Verify
-1. Open the church app as the existing admin and submit a **new** test announcement.
-2. Recent Announcements will initially say "Queued for delivery", then "Sending to OneSignal…" and then "Accepted by OneSignal", or "Delivery failed". The history refreshes about every 15 seconds while the page is visible.
-3. Check the OneSignal dashboard for the push and test receipt on a subscribed device. "Accepted by OneSignal" is **not** a guarantee that every device received it.
-4. If needed, check Firebase Console → Functions → sendAdminAnnouncement → Logs.
+## Step 3 — Run the workflow
+1. GitHub → Actions → **Church Admin Push Notifications (Free)**.
+2. Select **Run workflow**. Check the logs. If there are queued announcements, this run may send them; verify that they were not already delivered by another system.
+3. The workflow then checks automatically approximately every 5 minutes (subject to GitHub schedule delays).
+4. Open the app → Admin Notifications → Recent Announcements. It refreshes approximately every 15 seconds while open.
+5. Check OneSignal → Messages → Push to confirm the accepted push and test receipt on a subscribed phone.
 
-**Important:** This function triggers on *newly created* announcements only. Old pending records will not be automatically sent. To avoid duplicates, verify their status in OneSignal before resending.
-
-**Security:** Only the existing Firebase admin UID can create announcements under Firestore rules. The Cloud Function holds the OneSignal REST key in Firebase Secret Manager, not in the public website. Failed/ambiguous sends are not automatically retried because a network timeout after OneSignal accepts a request could otherwise cause duplicate notifications.
-
-**Scope:** This function sends manually submitted Admin Notifications. Devotion publication notifications require a separate trigger and are not included in this deployment.
+## Notes
+- Existing pending messages will be picked up when you first run the workflow. Review them before enabling the secrets if you do not want old notifications to go out.
+- This only processes **adminAnnouncements**, not Devotions; devotion push alerts need separate work.
+- **Queued** means Firestore accepted the request, not that OneSignal has received it.
+- **Accepted by OneSignal** means the provider returned an ID, not that every phone received it.
+- This design marks ambiguous errors as failed without automatically retrying, to reduce accidental duplicate pushes.
+- GitHub Actions scheduled jobs can be delayed or disabled after repository inactivity; monitor the Actions page.
+- Firestore usage and service-account credentials are subject to Firebase/Google Cloud terms and free-tier quotas. No Firebase Cloud Functions deployment is required.

@@ -32,7 +32,7 @@ def main():
         data = snapshot.to_dict()
         body = {
             "app_id": APP_ID, "target_channel": "push",
-            "included_segments": ["Subscribed Users"],
+            "included_segments": ["Total Subscriptions"],
             "headings": {"en": data["title"]},
             "contents": {"en": data["message"]},
             "url": URL,

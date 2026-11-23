@@ -81,19 +81,100 @@ service cloud.firestore {
     match /devotions/{devotionId} {
       allow get, list: if resource.data.status == 'published' || devotionEditor();
       allow create: if devotionEditor() &&
-        request.resource.data.keys().hasOnly(['title','scripture','body','status','authorEmail','publishedAt','updatedAt']) &&
+        request.resource.data.keys().hasOnly(['title','scripture','body','devotionDate','status','authorEmail','publishedAt','updatedAt']) &&
         request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
         request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
         request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.devotionDate is string && request.resource.data.devotionDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+        request.resource.data.authorEmail == request.auth.token.email &&
+        request.resource.data.publishedAt == request.time &&
+        request.resource.data.devotionDate is string && request.resource.data.devotionDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+      allow update: if devotionEditor() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
+        request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
+        request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
         request.resource.data.status == 'published' &&
         request.resource.data.authorEmail == request.auth.token.email &&
         request.resource.data.publishedAt == request.time &&
         request.resource.data.updatedAt == request.time;
       allow update: if devotionEditor() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','updatedAt']) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
         request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
         request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
         request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
+        request.resource.data.updatedAt == request.time;
+      allow update: if devotionEditor() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
+        request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
+        request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.devotionDate is string && request.resource.data.devotionDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
+        request.resource.data.status == 'published' &&
+        request.resource.data.authorEmail == request.auth.token.email &&
+        request.resource.data.publishedAt == request.time &&
+        request.resource.data.updatedAt == request.time;
+      allow update: if devotionEditor() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
+        request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
+        request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
+        request.resource.data.status == 'published' &&
+        request.resource.data.authorEmail == request.auth.token.email &&
+        request.resource.data.publishedAt == request.time &&
+        request.resource.data.devotionDate is string && request.resource.data.devotionDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+      allow update: if devotionEditor() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
+        request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
+        request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
+        request.resource.data.updatedAt == request.time;
+      allow update: if devotionEditor() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','scripture','body','devotionDate','updatedAt']) &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 120 &&
+        request.resource.data.scripture is string && request.resource.data.scripture.size() >= 3 && request.resource.data.scripture.size() <= 200 &&
+        request.resource.data.body is string && request.resource.data.body.size() >= 20 && request.resource.data.body.size() <= 10000 &&
+        request.resource.data.devotionDate is string && request.resource.data.devotionDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}) &&
         request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }

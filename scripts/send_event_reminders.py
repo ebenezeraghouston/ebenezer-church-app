@@ -108,6 +108,27 @@ def main():
             except Exception as error:
                 print('WARNING: Unable to cancel individual Sunday push:', push_id, error, flush=True)
 
+    # Remove previously scheduled hourly Women's Zoom Prayer notifications.
+    # New reminders are limited to one push at 1:00 PM Houston time each meeting day.
+    if not args.dry_run:
+        for item in list(history):
+            if "Women's Zoom Prayer" not in item.get('title', ''):
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now:
+                continue
+            push_id = item.get('push_id')
+            if not push_id:
+                continue
+            cancel_url = 'https://api.onesignal.com/notifications/' + push_id + '?' + urlencode({'app_id': APP_ID})
+            try:
+                with urlopen(Request(cancel_url, headers={'Authorization': 'Key ' + key}, method='DELETE'), timeout=30) as response:
+                    print("Cancelled queued hourly Women's Zoom Prayer push:", push_id, response.status)
+                history.remove(item)
+                history_changed = True
+            except Exception as error:
+                print("WARNING: Unable to cancel queued Women's Zoom Prayer push:", push_id, error, flush=True)
+
     if args.send_test:
         if args.dry_run:
             parser.error('--send-test cannot be combined with --dry-run')
@@ -208,7 +229,19 @@ def main():
             # Fasting prayer replaces every regular gathering January 3–10, 2027.
             if date(2027, 1, 4) <= meeting_start.date() <= date(2027, 1, 9):
                 continue
-            # Preserve the existing hourly reminder schedule for recurring weekly gatherings.
+            # Women's Zoom Prayer: exactly one reminder per meeting day at 1 PM Houston time.
+            if meeting['id'] == 'womens-zoom-prayer':
+                reminder_at = meeting_start.replace(hour=13, minute=0)
+                if reminder_at - timedelta(hours=36) <= now < meeting_start:
+                    # Do not send late after the scheduled reminder window.
+                    if now <= reminder_at + timedelta(minutes=30):
+                        title = "Today: Women's Zoom Prayer at 2:00 PM"
+                        body = 'Join the Zoom prayer meeting today at 2:00 PM Houston time.'
+                        token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/womens-zoom-prayer/{meeting_start.date()}/1pm-only')
+                        notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':meeting_start.isoformat()}) + '#notifications'
+                        send(title, body, token, notice_url, meeting_start.isoformat(), reminder_at if reminder_at > now else None)
+                continue
+            # Preserve the existing hourly reminder schedule for other recurring weekly gatherings.
             for minutes in range(1440, 0, -60):
                 label = 'Tomorrow' if minutes == 1440 else 'Starting in ' + str(minutes // 60) + ' hour' + ('' if minutes == 60 else 's')
                 reminder_at = meeting_start - timedelta(minutes=minutes)

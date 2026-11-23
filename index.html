@@ -127,7 +127,27 @@ const weeklyCalendarSchedule={
  5:[['Friday Fasting Prayer','10:00 AM','Online via Zoom']]
 };
 function recurringEventsOnDay(day){if(day>='2027-01-04'&&day<='2027-01-09')return [];const weekday=new Date(day+'T12:00:00').getDay();return (weeklyCalendarSchedule[weekday]||[]).map(([title,time,place])=>({title,time,place}))}
-function eventsOnCalendarDay(day){return churchEvents.filter(e=>e.date<=day&&(e.end||e.date)>=day).sort((a,b)=>a.date.localeCompare(b.date))}
+// Compare event completion against Houston local time, including multi-day events.
+function houstonNow(){
+ return new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(new Date()).replace(' ','T');
+}
+function eventEndLocal(e){
+ if(e.end_local)return e.end_local;
+ if(Array.isArray(e.start_times_local)&&e.start_times_local.length){
+  const last=[...e.start_times_local].sort().at(-1);
+  // Evening prayer sessions end at 8:30 PM; morning-only sessions at noon.
+  return last.slice(0,11)+(last.slice(11,16)>='19:00'?'20:30:00':'12:00:00');
+ }
+ if(e.end)return e.end+'T23:59:59';
+ if(e.start_local){
+  // If no ending time is supplied, keep a single event visible for 3 hours.
+  const start=new Date(e.start_local+'Z');
+  return new Date(start.getTime()+3*60*60*1000).toISOString().slice(0,19);
+ }
+ return e.date+'T23:59:59';
+}
+function isUpcomingChurchEvent(e){return eventEndLocal(e)>=houstonNow()}
+function eventsOnCalendarDay(day){return churchEvents.filter(e=>isUpcomingChurchEvent(e)&&e.date<=day&&(e.end||e.date)>=day).sort((a,b)=>a.date.localeCompare(b.date))}
 function weeklyEventHTML(e){return '<article class="weekly-calendar-event"><span class="weekly-calendar-tag">Regular weekly gathering</span><strong>'+escapeHTML(e.title)+'</strong><span class="weekly-calendar-time">'+escapeHTML(e.time)+'</span><small>'+escapeHTML(e.place)+'</small></article>'}
 function calendarEventDetail(e){return '<details class="calendar-event-detail"><summary><span><strong>'+escapeHTML(e.title)+'</strong><small>'+escapeHTML(e.time||'See details')+'</small></span><span aria-hidden="true">⌄</span></summary><div class="calendar-event-body">'+eventHTML(e)+'</div></details>'}
 function calendarWeeklyDetail(e){return '<details class="calendar-event-detail weekly"><summary><span><strong>'+escapeHTML(e.title)+'</strong><small>'+escapeHTML(e.time)+'</small></span><span aria-hidden="true">⌄</span></summary><div class="calendar-event-body">'+weeklyEventHTML(e)+'</div></details>'}
@@ -170,9 +190,8 @@ async function loadChurchEvents(){
   const data=await response.json();
   if(!Array.isArray(data))throw new Error('Events data is not a list');
   churchEvents=data;
-  const today=new Date().toLocaleDateString('en-CA');
-  const upcoming=data.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
-  eventList.innerHTML=data.map(eventHTML).join('')||'<p>No events listed.</p>';
+  const upcoming=data.filter(isUpcomingChurchEvent).sort((a,b)=>a.date.localeCompare(b.date));
+  eventList.innerHTML=upcoming.map(eventHTML).join('')||'<p>No upcoming events currently listed.</p>';
   try{renderHomeMonth()}catch(error){console.error('Monthly events display:',error);homeEvents.innerHTML=upcoming.slice(0,5).map(eventHTML).join('')||'<p>No upcoming events.</p>'}
   notificationEvents.innerHTML=upcoming.slice(0,5).map(eventHTML).join('')||'<p>No upcoming events currently listed.</p>';
  }catch(error){

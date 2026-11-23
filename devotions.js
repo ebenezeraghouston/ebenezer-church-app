@@ -1,6 +1,6 @@
 import {initializeApp,getApps} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
-import {getFirestore,collection,addDoc,getDocs,doc,updateDoc,query,orderBy,serverTimestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import {getFirestore,collection,addDoc,getDocs,doc,updateDoc,query,where,serverTimestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 const cfg={apiKey:"AIzaSyDqRQoIYmEpEaK0-qFPuQeHU9YlPdREoF4",authDomain:"ebenezer-ag-church-app.firebaseapp.com",projectId:"ebenezer-ag-church-app",appId:"1:174964350833:web:8a8b54d382410f49d560d0"};
 const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
 const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
@@ -24,15 +24,14 @@ function render(){
  }
 }
 async function refresh(){
- try{const snap=await getDocs(query(collection(db,'devotions'),orderBy('publishedAt','desc')));entries=snap.docs.map(d=>({id:d.id,...d.data()}));render();}
- catch(e){$('devotion-status').textContent='Unable to load devotions: '+e.message;}
+ try{const snap=await getDocs(query(collection(db,'devotions'),where('status','==','published')));entries=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.publishedAt?.toMillis?.()||0)-(a.publishedAt?.toMillis?.()||0));$('devotion-status').textContent='';render();}
+ catch(e){console.warn('Devotions could not load:',e);entries=[];render();$('devotion-status').textContent=e.code==='permission-denied'?'Devotions are temporarily unavailable. The church administrator needs to publish the updated Firebase security rules.':'Devotions are temporarily unavailable. Please try again later.';}
 }
 onAuthStateChanged(auth,u=>{
- editor=permitted(u);$('devotion-editor').hidden=!editor;$('devotion-login').hidden=editor;$('devotion-logout').hidden=!editor;
+ editor=permitted(u);$('devotion-editor').hidden=!editor;$('devotion-login').hidden=editor;
  $('devotion-access').hidden=true;
 });
 $('devotion-login').onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());if(!permitted(auth.currentUser))$('devotion-status').textContent='This Google account does not have devotion publishing permission.';}catch(e){$('devotion-status').textContent='Sign-in failed: '+e.message;}};
-$('devotion-logout').onclick=()=>signOut(auth);
 $('devotion-form').onsubmit=async e=>{
  e.preventDefault();if(!permitted(auth.currentUser))return;
  const title=$('devotion-title').value.trim(),scripture=$('devotion-scripture').value.trim(),body=$('devotion-body').value.trim(),devotionDate=$('devotion-date').value,id=$('devotion-id').value;

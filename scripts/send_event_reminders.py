@@ -112,7 +112,7 @@ def main():
     # New reminders are limited to one push at 1:00 PM Houston time each meeting day.
     if not args.dry_run:
         for item in list(history):
-            if "Women's Zoom Prayer" not in item.get('title', ''):
+            if "Women's Zoom Prayer" not in item.get('title', '') or item.get('title', '').startswith("Today: Women's Zoom Prayer at 2:00 PM"):
                 continue
             scheduled = item.get('scheduled_for')
             if not scheduled or datetime.fromisoformat(scheduled) <= now:

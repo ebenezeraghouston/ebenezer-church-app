@@ -77,7 +77,7 @@ header .header-menu{flex-shrink:0}
 <script>
 'use strict';
 const menuToggle=document.getElementById('menu-toggle'),appMenu=document.getElementById('app-menu');menuToggle.addEventListener('click',()=>{appMenu.hidden=!appMenu.hidden;menuToggle.setAttribute('aria-expanded',String(!appMenu.hidden))});document.addEventListener('click',e=>{if(!e.target.closest('.header-menu')){appMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false')}});
-const tabs=['home','events','ministries','giving','pastors','notifications','directory','prayer','sermon-notes','bible'];
+const tabs=['home','events','ministries','giving','pastors','notifications','directory','prayer','sermon-notes','bible','devotions'];
 // Each non-home section gets one history entry above Home, so Android Back returns Home.
 // Switching between sections replaces that entry instead of stacking many pages.
 const initialTab=tabs.includes(location.hash.slice(1))?location.hash.slice(1):'home';

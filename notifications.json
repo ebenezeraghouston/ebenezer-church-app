@@ -1,5 +1,14 @@
 [
   {
+    "id": "f9c955f2-90c4-344e-8862-bae968e90593",
+    "title": "Starting in 1 hour: Thanksgiving Gathering",
+    "body": "Wed, Nov 25 at 7:30 PM Houston time · FOOD SIGN-UP: Please sign up to bring a dish! GIFT EXCHANGE: Bring a gift ($25 maximum). Tap for the food sign-up link and details.",
+    "sent_at": "2026-11-24T06:49:11.530995-06:00",
+    "push_id": "52df2631-f680-4f98-a162-4d6f5a0d420c",
+    "expires_at": "2026-11-25T19:30:00-06:00",
+    "scheduled_for": "2026-11-25T18:30:00-06:00"
+  },
+  {
     "id": "9defdd9d-8970-5d4e-bd7a-84963febf14e",
     "title": "Today: Women's Zoom Prayer at 2:00 PM",
     "body": "Join the Zoom prayer meeting today at 2:00 PM Houston time.",

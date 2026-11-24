@@ -1,5 +1,14 @@
 [
   {
+    "id": "f343a680-fd2d-3ebd-8b40-31e3b614f568",
+    "title": "Starting in 30 minutes: Thanksgiving Gathering",
+    "body": "Wed, Nov 25 at 7:30 PM Houston time · FOOD SIGN-UP: Please sign up to bring a dish! GIFT EXCHANGE: Bring a gift ($25 maximum). Tap for the food sign-up link and details.",
+    "sent_at": "2026-11-24T08:09:43.475639-06:00",
+    "push_id": "ff2fa4a2-6ec2-4359-8f72-93f3ca0ab654",
+    "expires_at": "2026-11-25T19:30:00-06:00",
+    "scheduled_for": "2026-11-25T19:00:00-06:00"
+  },
+  {
     "id": "f9c955f2-90c4-344e-8862-bae968e90593",
     "title": "Starting in 1 hour: Thanksgiving Gathering",
     "body": "Wed, Nov 25 at 7:30 PM Houston time · FOOD SIGN-UP: Please sign up to bring a dish! GIFT EXCHANGE: Bring a gift ($25 maximum). Tap for the food sign-up link and details.",

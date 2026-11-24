@@ -41,8 +41,8 @@ def main():
         print(f'{title}: {body}', flush=True)
         if args.dry_run:
             return
-        if any(item.get('id') == str(token) for item in history):
-            print('Already sent; skipping duplicate:', token)
+        if any(item.get('id') == str(token) and item.get('push_id') for item in history):
+            print('OneSignal previously accepted; skipping duplicate:', token)
             return
         payload = {'app_id': APP_ID, 'included_segments': ['Total Subscriptions'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token), 'ttl': 3600}
         if scheduled_at and scheduled_at > now:
@@ -58,7 +58,8 @@ def main():
                 return False
             raise RuntimeError('OneSignal notification not accepted: ' + str(errors))
         print('OneSignal accepted notification:', result['id'])
-        if not any(item.get('id') == str(token) for item in history):
+        if not any(item.get('id') == str(token) and item.get('push_id') for item in history):
+            history[:] = [item for item in history if item.get('id') != str(token)]
             history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at, 'scheduled_for':scheduled_at.isoformat() if scheduled_at else None})
             history_changed = True
     # One-time cleanup: cancel previously queued hourly Youth Meeting alerts.
@@ -245,8 +246,8 @@ def main():
             if meeting['id'] == 'womens-zoom-prayer':
                 reminder_at = meeting_start.replace(hour=13, minute=0)
                 if reminder_at - timedelta(hours=36) <= now < meeting_start:
-                    # Do not send late after the scheduled reminder window.
-                    if now <= reminder_at + timedelta(minutes=30):
+                    # Allow retry until the meeting starts if OneSignal has not accepted the push.
+                    if now < meeting_start:
                         title = "Today: Women's Zoom Prayer at 2:00 PM"
                         body = 'Join the Zoom prayer meeting today at 2:00 PM Houston time.'
                         token = uuid.uuid5(uuid.NAMESPACE_URL, f'{APP_ID}/womens-zoom-prayer/{meeting_start.date()}/1pm-only')

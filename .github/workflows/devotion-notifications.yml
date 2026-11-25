@@ -1,0 +1,43 @@
+name: New Devotion Push Notifications
+
+on:
+  schedule:
+    # GitHub schedule is best effort; new devotions are processed within a later run.
+    - cron: '3-59/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview without sending or changing notification records'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: new-devotion-notifications
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Firebase Admin SDK
+        run: python -m pip install firebase-admin
+      - name: Process new published devotions
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            python scripts/send_devotion_notifications.py --dry-run
+          else
+            python scripts/send_devotion_notifications.py
+          fi

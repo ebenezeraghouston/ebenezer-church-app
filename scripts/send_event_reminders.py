@@ -1,3 +1,131 @@
+import argparse
+import json
+import os
+import uuid
+from datetime import date, datetime, time, timedelta
+from pathlib import Path
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
+
+ROOT = Path(__file__).resolve().parents[1]
+APP_ID = '85bfa892-43b6-40ec-8f07-255f95f6fd43'
+BASE = 'https://ebenezeraghouston.github.io/ebenezer-church-app/#events'
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--send-test', action='store_true', help='Send a one-time immediate test push, ignoring reminder schedule')
+    parser.add_argument('--date', type=date.fromisoformat)
+    parser.add_argument('--preview-time', help='Houston local HH:MM; dry run only')
+    args = parser.parse_args()
+    if (args.date or args.preview_time) and not args.dry_run:
+        parser.error('--date and --preview-time require --dry-run')
+    now = datetime.now(ZoneInfo('America/Chicago'))
+    if args.preview_time or args.date:
+        now = datetime.combine(args.date or now.date(), time.fromisoformat(args.preview_time) if args.preview_time else now.time(), ZoneInfo('America/Chicago'))
+    today = args.date or now.date()
+    events = json.loads((ROOT / 'events.json').read_text(encoding='utf-8'))
+    key = os.environ.get('ONESIGNAL_REST_API_KEY')
+    if not args.dry_run and not key:
+        raise SystemExit('Missing secret ONESIGNAL_REST_API_KEY')
+    count = 0
+    history_path = ROOT / 'notifications.json'
+    history = json.loads(history_path.read_text(encoding='utf-8'))
+    original_count = len(history)
+    history = [item for item in history if item.get('sent_at') and timedelta(0) <= now - datetime.fromisoformat(item['sent_at']) < timedelta(days=14)]
+    history_changed = len(history) != original_count and not args.dry_run
+    def save_history():
+        if not args.dry_run:
+            temp = history_path.with_suffix('.tmp')
+            temp.write_text(json.dumps(history, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+            temp.replace(history_path)
+
+    def send(title, body, token, url, expires_at=None, scheduled_at=None):
+        nonlocal count, history_changed
+        count += 1
+        print(f'{title}: {body}', flush=True)
+        if any(item.get('id') == str(token) and item.get('push_id') for item in history):
+            print('OneSignal previously accepted; skipping duplicate:', token)
+            return
+        if args.dry_run:
+            print('Preview delivery:', scheduled_at or now, flush=True)
+            return
+        payload = {'app_id': APP_ID, 'included_segments': ['Total Subscriptions'], 'target_channel': 'push', 'headings': {'en': title}, 'contents': {'en': body}, 'url': url, 'idempotency_key': str(token if token.version in (4, 5) else uuid.uuid5(uuid.NAMESPACE_URL, str(token))), 'ttl': 3600}
+        if scheduled_at and scheduled_at > now:
+            payload['send_after'] = scheduled_at.isoformat()
+        req = Request('https://api.onesignal.com/notifications', data=json.dumps(payload).encode(), headers={'Authorization': 'Key ' + key, 'Content-Type': 'application/json'}, method='POST')
+        with urlopen(req, timeout=30) as resp:
+            result = json.load(resp)
+        if not result.get('id'):
+            errors = result.get('errors', 'unknown error')
+            error_text = str(errors).lower()
+            if 'all included players are not subscribed' in error_text or 'no subscribed' in error_text:
+                print('WARNING: OneSignal has no eligible subscribed devices for this push. No notification was sent; leaving it unrecorded so a later run can retry.', flush=True)
+                return False
+            raise RuntimeError('OneSignal notification not accepted: ' + str(errors))
+        print('OneSignal accepted notification:', result['id'])
+        if not any(item.get('id') == str(token) and item.get('push_id') for item in history):
+            history[:] = [item for item in history if item.get('id') != str(token)]
+            history.insert(0, {'id':str(token), 'title':title, 'body':body, 'sent_at':now.isoformat(), 'push_id':result['id'], 'expires_at':expires_at, 'scheduled_for':scheduled_at.isoformat() if scheduled_at else None})
+            history_changed = True
+            save_history()
+    # Cancel any previously queued individual Sunday service pushes, including
+    # hourly alerts. The consolidated Sunday reminders replace them.
+    sunday_titles = ('Malayalam Sunday School', 'English Worship Service', 'English Sunday School',
+                     'Malayalam Worship Service', 'Spanish Service')
+    if not args.dry_run:
+        for item in list(history):
+            if not any(name in item.get('title', '') for name in sunday_titles):
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now:
+                continue
+            push_id = item.get('push_id')
+            if not push_id:
+                continue
+            url = 'https://api.onesignal.com/notifications/' + push_id + '?' + urlencode({'app_id': APP_ID})
+            try:
+                with urlopen(Request(url, headers={'Authorization': 'Key ' + key}, method='DELETE'), timeout=30) as response:
+                    print('Cancelled individual Sunday push:', push_id, response.status)
+                history.remove(item)
+                history_changed = True
+            except Exception as error:
+                print('WARNING: Unable to cancel individual Sunday push:', push_id, error, flush=True)
+
+    # Remove previously scheduled hourly Women's Zoom Prayer notifications.
+    # New reminders are limited to one push at 1:00 PM Houston time each meeting day.
+    if not args.dry_run:
+        for item in list(history):
+            if "Women's Zoom Prayer" not in item.get('title', ''):
+                continue
+            # Preserve only the new once-daily 1 PM notification for its meeting date.
+            # Older 'Today' notifications may also be queued hourly and must be cancelled.
+            scheduled_date = None
+            try:
+                scheduled_date = datetime.fromisoformat(item.get('scheduled_for') or '').astimezone(ZoneInfo('America/Chicago')).date()
+            except (ValueError, TypeError):
+                pass
+            expected_token = (str(uuid.uuid5(uuid.NAMESPACE_URL,
+                f'{APP_ID}/womens-zoom-prayer/{scheduled_date}/1pm-only'))
+                if scheduled_date else None)
+            if item.get('id') == expected_token:
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now:
+                continue
+            push_id = item.get('push_id')
+            if not push_id:
+                continue
+            cancel_url = 'https://api.onesignal.com/notifications/' + push_id + '?' + urlencode({'app_id': APP_ID})
+            try:
+                with urlopen(Request(cancel_url, headers={'Authorization': 'Key ' + key}, method='DELETE'), timeout=30) as response:
+                    print("Cancelled queued hourly Women's Zoom Prayer push:", push_id, response.status)
+                history.remove(item)
+                history_changed = True
+            except Exception as error:
+                print("WARNING: Unable to cancel queued Women's Zoom Prayer push:", push_id, error, flush=True)
+
     if args.send_test:
         if args.dry_run:
             parser.error('--send-test cannot be combined with --dry-run')

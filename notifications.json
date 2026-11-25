@@ -1,5 +1,14 @@
 [
   {
+    "id": "123e2bb4-78fe-36f8-b00c-cd8fd8c1f5c5",
+    "title": "Starting now: Thanksgiving Gathering",
+    "body": "Wed, Nov 25 at 7:30 PM Houston time · FOOD SIGN-UP: Please sign up to bring a dish! GIFT EXCHANGE: Bring a gift ($25 maximum). Tap for the food sign-up link and details.",
+    "sent_at": "2026-11-25T09:41:33.032495-06:00",
+    "push_id": "a3284d6f-ad71-4b5b-b9c7-adf2d2a2fa20",
+    "expires_at": "2026-11-25T20:30:00-06:00",
+    "scheduled_for": "2026-11-25T19:30:00-06:00"
+  },
+  {
     "id": "6e7b7cd1-092c-395a-a807-8868efd070a1",
     "title": "Starting in 15 hours: Friday Fasting Prayer (Zoom)",
     "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",

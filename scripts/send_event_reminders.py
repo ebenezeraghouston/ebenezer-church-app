@@ -126,6 +126,37 @@ def main():
             except Exception as error:
                 print("WARNING: Unable to cancel queued Women's Zoom Prayer push:", push_id, error, flush=True)
 
+    # Cancel obsolete queued fasting prayer reminders, retaining only 24h/1h alerts.
+    if not args.dry_run:
+        allowed = set()
+        for event in events:
+            if 'fasting prayer' not in event.get('title', '').lower():
+                continue
+            for start in event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else []):
+                dt = datetime.fromisoformat(start).replace(tzinfo=ZoneInfo('America/Chicago'))
+                for minutes in (1440, 60):
+                    allowed.add(str(uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/{event["id"]}/{dt.isoformat()}/{minutes}min')))
+        for offset in range(3):
+            day = (now + timedelta(days=offset)).date()
+            if day.weekday() == 4 and not any('fasting prayer' in e.get('title', '').lower() and any(datetime.fromisoformat(s).date() == day for s in e.get('start_times_local', [])) for e in events):
+                for minutes in (1440, 60):
+                    allowed.add(str(uuid.uuid3(uuid.NAMESPACE_URL, f'{APP_ID}/friday-fasting-prayer/{day}/{minutes}min')))
+        for item in list(history):
+            if 'fasting prayer' not in item.get('title', '').lower() or item.get('id') in allowed:
+                continue
+            scheduled = item.get('scheduled_for')
+            if not scheduled or datetime.fromisoformat(scheduled) <= now or not item.get('push_id'):
+                continue
+            try:
+                url = 'https://api.onesignal.com/notifications/' + item['push_id'] + '?' + urlencode({'app_id': APP_ID})
+                with urlopen(Request(url, headers={'Authorization': 'Key ' + key}, method='DELETE'), timeout=30):
+                    pass
+                history.remove(item)
+                history_changed = True
+                save_history()
+            except Exception as error:
+                print('WARNING: Unable to cancel queued fasting prayer push:', error, flush=True)
+
     if args.send_test:
         if args.dry_run:
             parser.error('--send-test cannot be combined with --dry-run')
@@ -152,8 +183,8 @@ def main():
         start_times = event.get('start_times_local') or ([event['start_local']] if event.get('start_local') else [])
         for start_text in start_times:
             event_start = datetime.fromisoformat(start_text).replace(tzinfo=ZoneInfo('America/Chicago'))
-            for minutes in (1440, 0):
-                label = 'Tomorrow' if minutes == 1440 else 'Starting now'
+            for minutes in ((1440, 60) if 'fasting prayer' in event['title'].lower() else (1440, 0)):
+                label = 'Tomorrow' if minutes == 1440 else ('In one hour' if minutes == 60 else 'Starting now')
                 reminder_at = event_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, event_start, minutes):
                     continue
@@ -222,9 +253,11 @@ def main():
                         notice_url = BASE.split('#')[0] + '?' + urlencode({'notice_title':title,'notice_body':body,'notice_id':str(token),'notice_expires':meeting_start.isoformat()}) + '#notifications'
                         send(title, body, token, notice_url, meeting_start.isoformat(), reminder_at if reminder_at > now else None)
                 continue
-            # Friday prayer: day before and at start only.
-            for minutes in (1440, 0):
-                label = 'Tomorrow' if minutes == 1440 else 'Starting now'
+            # Skip regular Friday prayer when a special fasting event covers it.
+            if any('fasting prayer' in e.get('title', '').lower() and any(datetime.fromisoformat(s).date() == meeting_start.date() for s in e.get('start_times_local', [])) for e in events):
+                continue
+            for minutes in (1440, 60):
+                label = 'Tomorrow' if minutes == 1440 else 'In one hour'
                 reminder_at = meeting_start - timedelta(minutes=minutes)
                 if not reminder_eligible(reminder_at, meeting_start, minutes):
                     continue

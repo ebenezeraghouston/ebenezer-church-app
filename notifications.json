@@ -1,5 +1,23 @@
 [
   {
+    "id": "a42747b6-2df9-3747-b605-16518164231c",
+    "title": "In one hour: Fasting Prayer",
+    "body": "Fri, Nov 27 at 7:00 PM Houston time · All services at church",
+    "sent_at": "2026-11-26T14:35:05.850223-06:00",
+    "push_id": "cb937f1b-963a-49d5-a095-18e7b9ca6683",
+    "expires_at": "2026-11-27T19:00:00-06:00",
+    "scheduled_for": "2026-11-27T18:00:00-06:00"
+  },
+  {
+    "id": "9359112a-d25f-3d04-87e7-78764bc74785",
+    "title": "In one hour: Fasting Prayer",
+    "body": "Fri, Nov 27 at 10:00 AM Houston time · All services at church",
+    "sent_at": "2026-11-26T14:35:05.850223-06:00",
+    "push_id": "979ab33c-4821-4f25-8070-398fd75c51cf",
+    "expires_at": "2026-11-27T10:00:00-06:00",
+    "scheduled_for": "2026-11-27T09:00:00-06:00"
+  },
+  {
     "id": "73ea3bba-e168-3889-a9fe-68ecb250b64f",
     "title": "Tomorrow: Fasting Prayer",
     "body": "Sat, Nov 28 at 7:00 PM Houston time · All services at church",
@@ -9,39 +27,12 @@
     "scheduled_for": "2026-11-27T19:00:00-06:00"
   },
   {
-    "id": "d9b91c69-02fc-3193-aabc-4c9216f11539",
-    "title": "Starting now: Fasting Prayer",
-    "body": "Fri, Nov 27 at 7:00 PM Houston time · All services at church",
-    "sent_at": "2026-11-26T08:16:26.357732-06:00",
-    "push_id": "8ece0e37-9469-4dd9-8d0a-c02aee13c703",
-    "expires_at": "2026-11-27T20:00:00-06:00",
-    "scheduled_for": "2026-11-27T19:00:00-06:00"
-  },
-  {
-    "id": "a1fe544e-b789-3884-b30b-b76c5c571a2c",
-    "title": "Starting now: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T22:54:17.060351-06:00",
-    "push_id": "e111f510-ecad-4990-aa6b-c0c0931a00dc",
-    "expires_at": "2026-11-27T11:00:00-06:00",
-    "scheduled_for": "2026-11-27T10:00:00-06:00"
-  },
-  {
     "id": "38a6b074-c297-35d3-8cfd-a957303ec772",
     "title": "Tomorrow: Fasting Prayer",
     "body": "Sat, Nov 28 at 10:00 AM Houston time · All services at church",
     "sent_at": "2026-11-25T22:54:17.060351-06:00",
     "push_id": "660e1560-7cfa-4ab5-a652-03487927e5db",
     "expires_at": "2026-11-28T10:00:00-06:00",
-    "scheduled_for": "2026-11-27T10:00:00-06:00"
-  },
-  {
-    "id": "5ebc2037-1c6f-3792-adf3-ca5a953dde50",
-    "title": "Starting now: Fasting Prayer",
-    "body": "Fri, Nov 27 at 10:00 AM Houston time · All services at church",
-    "sent_at": "2026-11-25T22:54:17.060351-06:00",
-    "push_id": "c951559b-84bf-4a4f-930a-aba4da79c67a",
-    "expires_at": "2026-11-27T11:00:00-06:00",
     "scheduled_for": "2026-11-27T10:00:00-06:00"
   },
   {
@@ -54,24 +45,6 @@
     "scheduled_for": "2026-11-25T19:30:00-06:00"
   },
   {
-    "id": "6e7b7cd1-092c-395a-a807-8868efd070a1",
-    "title": "Starting in 15 hours: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T07:20:58.494105-06:00",
-    "push_id": "e9c47fbc-aa0b-4ef2-810d-69819bdf7357",
-    "expires_at": "2026-11-27T10:00:00-06:00",
-    "scheduled_for": "2026-11-26T19:00:00-06:00"
-  },
-  {
-    "id": "3355ef71-92fc-3cde-b3dc-e7d562c1ae14",
-    "title": "Starting in 16 hours: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T07:20:58.494105-06:00",
-    "push_id": "232a7c09-5d45-4f21-8920-c8a06178c053",
-    "expires_at": "2026-11-27T10:00:00-06:00",
-    "scheduled_for": "2026-11-26T18:00:00-06:00"
-  },
-  {
     "id": "9487444f-4803-370e-bf55-24af16e78724",
     "title": "Tomorrow: Fasting Prayer",
     "body": "Fri, Nov 27 at 7:00 PM Houston time · All services at church",
@@ -79,33 +52,6 @@
     "push_id": "462e16b3-4670-42a7-b52f-0f5862265bab",
     "expires_at": "2026-11-27T19:00:00-06:00",
     "scheduled_for": "2026-11-26T19:00:00-06:00"
-  },
-  {
-    "id": "fccfbb5b-aac2-3923-a5c8-a90ae6f262b6",
-    "title": "Starting in 17 hours: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T05:58:28.305580-06:00",
-    "push_id": "274f0952-d228-453f-ba30-be0b3f8dc012",
-    "expires_at": "2026-11-27T10:00:00-06:00",
-    "scheduled_for": "2026-11-26T17:00:00-06:00"
-  },
-  {
-    "id": "8dd71685-0a15-3bc1-859c-a45a891d1ba5",
-    "title": "Starting in 18 hours: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T04:55:23.410861-06:00",
-    "push_id": "898324cf-f695-4462-94ba-c1a59521a825",
-    "expires_at": "2026-11-27T10:00:00-06:00",
-    "scheduled_for": "2026-11-26T16:00:00-06:00"
-  },
-  {
-    "id": "18e7cdbe-873e-3853-82a6-52cde7206826",
-    "title": "Starting in 19 hours: Friday Fasting Prayer (Zoom)",
-    "body": "10:00 AM Houston time · Join the weekly fasting prayer on Zoom.",
-    "sent_at": "2026-11-25T03:54:41.154153-06:00",
-    "push_id": "319f2e52-5256-444b-8416-8d37648b660c",
-    "expires_at": "2026-11-27T10:00:00-06:00",
-    "scheduled_for": "2026-11-26T15:00:00-06:00"
   },
   {
     "id": "ef137feb-a446-301f-ab2f-f1457fd4a0a0",

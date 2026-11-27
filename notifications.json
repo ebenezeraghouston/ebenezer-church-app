@@ -1,5 +1,32 @@
 [
   {
+    "id": "83d4158a-aed6-5c71-b3f0-60e9b30cd1e9",
+    "title": "Tomorrow: Ebenezer AG Sunday Services",
+    "body": "Malayalam Sunday School 9:15 AM; English Worship 10:00 AM; English Sunday School 11:00 AM; Malayalam Worship 11:00 AM; Spanish Service 2:00 PM. All times Houston local.",
+    "sent_at": "2026-11-27T07:15:01.963298-06:00",
+    "push_id": "6bc0be50-ce5d-480a-85e3-e604ae666258",
+    "expires_at": "2026-11-29T14:00:00-06:00",
+    "scheduled_for": "2026-11-28T18:00:00-06:00"
+  },
+  {
+    "id": "54e2881d-7f31-35dc-87a8-324c9b04bedc",
+    "title": "Tomorrow: Fasting Prayer",
+    "body": "Sun, Nov 29 at 7:00 PM Houston time · All services at church",
+    "sent_at": "2026-11-27T07:15:01.963298-06:00",
+    "push_id": "17251c6c-cda5-4aab-a6a6-5b3d389fd19c",
+    "expires_at": "2026-11-29T19:00:00-06:00",
+    "scheduled_for": "2026-11-28T19:00:00-06:00"
+  },
+  {
+    "id": "3e7f5c07-9c59-300f-af87-58e4c7fb22ed",
+    "title": "In one hour: Fasting Prayer",
+    "body": "Sat, Nov 28 at 7:00 PM Houston time · All services at church",
+    "sent_at": "2026-11-27T07:15:01.963298-06:00",
+    "push_id": "158acf3d-6275-4033-bcb9-e6dcb624defc",
+    "expires_at": "2026-11-28T19:00:00-06:00",
+    "scheduled_for": "2026-11-28T18:00:00-06:00"
+  },
+  {
     "id": "98dc4bdb-f46c-3fb9-bbc3-820c7f7bc71d",
     "title": "Tomorrow: Fasting Prayer",
     "body": "Sun, Nov 29 at 10:00 AM Houston time · All services at church",
